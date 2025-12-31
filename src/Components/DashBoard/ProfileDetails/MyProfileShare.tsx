@@ -5,6 +5,7 @@ import { MdImage, MdImageNotSupported } from 'react-icons/md';
 interface ShareProps {
   closePopup: () => void;
   profileId?: string | number | null;
+  EncryptedprofileID: string;
   profileName?: string;
   age?: number | string;
   starName?: string;
@@ -22,6 +23,7 @@ export const MyProfileShare: React.FC<ShareProps> = ({
   closePopup,
   //profileImagess,
   profileId,
+  EncryptedprofileID,
   profileName,
   age,
   starName,
@@ -46,8 +48,8 @@ export const MyProfileShare: React.FC<ShareProps> = ({
   // Dynamic URL to the profile share page
   // const shareUrl = `http://matrimonyapp.rainyseasun.com/ProfileImage?data=${encodedData}`;
 
-  const shareUrl = `https://app.vysyamala.com/auth/profile/${profileId}/`;
-  const shareUrlWithoutImage = `https://app.vysyamala.com/auth/profile_view/${profileId}/`
+  const shareUrl = `https://app.vysyamala.com/auth/profile/${EncryptedprofileID}/`;
+  const shareUrlWithoutImage = `https://app.vysyamala.com/auth/profile_view/${EncryptedprofileID}/`
   const title = 'Check out this profile!';
   const registrationLink = 'vysyamala.com'
 

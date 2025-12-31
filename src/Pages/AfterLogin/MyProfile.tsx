@@ -25,6 +25,7 @@ import { toast } from "react-toastify";
 
 interface GetProfileDetMatch {
   profile_id: string;
+  encrypted_profile_id: string;
   personal_profile_name: string;
   personal_age: number;
   personal_profile_height: string;
@@ -587,6 +588,7 @@ export const MyProfile = () => {
                               profileImagess={images[1]?.imageUrl || ""}
                               profileImage={get_myprofile_personal?.profile_id}
                               profileId={get_myprofile_personal?.profile_id}
+                              EncryptedprofileID={get_myprofile_personal?.encrypted_profile_id}
                               profileName={get_myprofile_personal?.personal_profile_name}
                               age={get_myprofile_personal?.personal_age}
                               starName={get_myprofile_personal?.star}
