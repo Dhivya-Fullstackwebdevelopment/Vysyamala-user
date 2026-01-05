@@ -479,7 +479,7 @@ export const InterestSentCard: React.FC<InterestSentCardProps> = ({ pageNumber, 
                   {/* Last Visit */}
                   <div>
                     <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
-                      <IoCalendar className="mr-2 text-primary" /> Last visit on {profile.myint_lastvisit}
+                      <IoCalendar className="mr-2 text-primary" /> Last Express Int on {profile.myint_lastvisit}
                     </p>
                   </div>
 

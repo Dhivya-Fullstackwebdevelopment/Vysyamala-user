@@ -401,7 +401,7 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
                         {/* Last Visit */}
                         <div>
                           <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
-                            <IoCalendar className="mr-2 text-primary" /> Bookmarked on  {profile.wishlist_lastvisit}
+                            <IoCalendar className="mr-2 text-primary" />Last Bookmarked on  {profile.wishlist_lastvisit}
                           </p>
                         </div>
 
