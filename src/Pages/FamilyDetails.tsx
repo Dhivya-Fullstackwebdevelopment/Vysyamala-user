@@ -43,6 +43,8 @@ const schema = zod.object({
   aboutMyFamily: zod.string().optional(),
   mother_alive: zod.string().optional(),
   father_alive: zod.string().optional(),
+  physicallyChallenged: zod.string().optional(),
+  defectDetails: zod.string().optional().nullable(),
 });
 
 
@@ -398,6 +400,7 @@ const FamilyDetails: React.FC = () => {
           setValue("aboutMyFamily", profileData.about_family);
           setValue("body_type", profileData.body_type);
           setValue("eye_wear", profileData.eye_wear);
+          setValue("defectDetails", profileData.Physically_challenged_details || "");
 
         } catch (error) {
           console.error("Error fetching family data:", error);
@@ -509,6 +512,7 @@ const FamilyDetails: React.FC = () => {
           no_of_children: data.no_of_children || 0,
         }),
         Pysically_changed: physicallyChallengedValue,
+        Physically_challenged_details: data.physicallyChallenged === "yes" ? data.defectDetails : "",
         no_of_brother: selectedBrother ?? 0,
         no_of_bro_married: selectedMarriedBrother ?? 0,
         no_of_sister: selectedSister ?? 0,
@@ -863,7 +867,8 @@ const FamilyDetails: React.FC = () => {
             </div>
             {physicallyChallengedValue === "yes" && (
               <div>
-                <InputField label="please explain the physically challenged in detail" />
+                <InputField label="please explain the physically challenged in detail"
+                  {...register("defectDetails")} />
               </div>
             )}
 
