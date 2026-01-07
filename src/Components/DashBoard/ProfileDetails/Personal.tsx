@@ -21,6 +21,7 @@ interface PersonalDetails {
   personal_profile_complexion_name: string;
   personal_hobbies: string;
   personal_pysically_changed: string;
+  Physically_challenged_details: string;
   personal_profile_for_name: string;
   marital_sts_id: number;
   height_id: number;
@@ -1232,6 +1233,15 @@ export const Personal = () => {
                   {personalDetails.personal_pysically_changed || "N/A"}
                 </span>
               </h5>
+              {personalDetails.Physically_challenged_details && (
+                <h5 className="text-[20px] text-ash font-semibold mb-4 max-lg:text-[16px]">
+                  Challenged Detail :
+                  <span className="font-normal">
+                    {" "}
+                    {personalDetails.Physically_challenged_details || "N/A"}
+                  </span>
+                </h5>
+              )}
 
               {/* <h5 className="text-[20px] text-ash font-semibold mb-4 max-lg:text-[16px]">
                 Profile Created By :
