@@ -18,7 +18,7 @@ import { ToastContainer, toast } from "react-toastify"; // Import ToastContainer
 import "react-toastify/dist/ReactToastify.css"; // Import the CSS for react-toastify
 import apiClient from "../../../API";
 import { Hearts } from "react-loader-spinner";
-import PlatinumModal from "../ReUsePopup/PlatinumModalPopup";
+//import PlatinumModal from "../ReUsePopup/PlatinumModalPopup";
 // Define types for API response
 interface Profile {
   visited_profileid: string;
@@ -65,7 +65,7 @@ export const ViewedProfilesCard: React.FC<ViewedProfilesCardProps> = ({ pageNumb
   const [activeProfileId, setActiveProfileId] = useState<string | null>(null);
   const location = useLocation();
   const [loading, setLoading] = useState<boolean>(true); // 👈 add local loading
-  const [showPlatinumModal, setShowPlatinumModal] = useState(false);
+  //const [showPlatinumModal, setShowPlatinumModal] = useState(false);
 
   useEffect(() => {
     // Fetch the data from the API
@@ -235,10 +235,10 @@ export const ViewedProfilesCard: React.FC<ViewedProfilesCardProps> = ({ pageNumb
   return (
     <div className="">
       <ToastContainer />
-      <PlatinumModal
+      {/* <PlatinumModal
         isOpen={showPlatinumModal}
         onClose={() => setShowPlatinumModal(false)}
-      />
+      /> */}
       {profiles.map((profile) => (
         <div
           key={profile.visited_profileid}
@@ -342,10 +342,10 @@ export const ViewedProfilesCard: React.FC<ViewedProfilesCardProps> = ({ pageNumb
                 {/* Tags */}
                 <div className="flex justify-start items-center gap-3 max-2xl:flex-wrap">
                   <div
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevents triggering handleProfileClick
-                      setShowPlatinumModal(true);
-                    }}
+                    // onClick={(e) => {
+                    //   e.stopPropagation(); // Prevents triggering handleProfileClick
+                    //   setShowPlatinumModal(true);
+                    // }}
                   >
                     <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
                       <IoCalendar className="mr-2 text-primary" /> Last viewed on {profile.visited_datetime}
