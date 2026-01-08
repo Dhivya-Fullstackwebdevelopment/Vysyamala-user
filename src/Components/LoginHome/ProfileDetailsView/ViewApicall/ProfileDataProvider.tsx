@@ -1,7 +1,8 @@
 // ProfileDataProvider.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import apiClient from '../../../../API';
-import { useLocation, useSearchParams } from 'react-router-dom';
+// import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { decryptId } from '../../../../utils/cryptoUtils';
 
 interface ProfileData {
@@ -18,8 +19,8 @@ export const ProfileDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const [profileData, setProfileData] = useState<ProfileData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
+    //const location = useLocation();
+    //const queryParams = new URLSearchParams(location.search);
     // const id = queryParams.get('id');
     const [searchParams] = useSearchParams(); // Add this hook (import from react-router-dom)
     const encryptedId = searchParams.get("id") || "";
