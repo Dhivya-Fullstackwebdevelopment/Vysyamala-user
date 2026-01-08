@@ -34,6 +34,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { MdToggleOff, MdToggleOn } from "react-icons/md";
 import { ToastContainer } from "react-toastify";
 import PaginationNew from "../PaginationNew";
+import { decryptId, encryptId } from "../../utils/cryptoUtils";
 // import { log } from "console";
 
 // const items = [
@@ -271,7 +272,11 @@ export const MatchingProfiles = () => {
       const searchParams = new URLSearchParams();
       searchParams.set('page', page.toString());
       searchParams.set('order_by', sortOrder);
-      if (searchProfileId) searchParams.set('search', searchProfileId);
+      // if (searchProfileId) searchParams.set('search', searchProfileId);
+      if (searchProfileId) {
+        const encryptedSearch = encryptId(searchProfileId);
+        searchParams.set('search', encryptedSearch);
+      }
       if (profession) searchParams.set('profession', profession);
       if (selectAge) searchParams.set('age', selectAge);
       if (selectedLocation) searchParams.set('location', selectedLocation);
@@ -334,7 +339,10 @@ export const MatchingProfiles = () => {
 
     // 1. Get the search parameters from the URL first.
     const searchParams = new URLSearchParams(location.search);
-    const urlSearch = searchParams.get('search');
+    // const urlSearch = searchParams.get('search');
+    const urlSearchEncrypted = searchParams.get('search');
+    const urlSearch = urlSearchEncrypted ? decryptId(urlSearchEncrypted) : null;
+
     const urlProfession = searchParams.get('profession');
     const urlAge = searchParams.get('age');
     const urlLocation = searchParams.get('location');

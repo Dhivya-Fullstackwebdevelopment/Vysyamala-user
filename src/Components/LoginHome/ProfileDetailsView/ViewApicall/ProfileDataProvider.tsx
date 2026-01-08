@@ -1,7 +1,8 @@
 // ProfileDataProvider.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import apiClient from '../../../../API';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
+import { decryptId } from '../../../../utils/cryptoUtils';
 
 interface ProfileData {
     personal_details: any;
@@ -19,7 +20,11 @@ export const ProfileDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const [error, setError] = useState<string | null>(null);
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const id = queryParams.get('id');
+    // const id = queryParams.get('id');
+    const [searchParams] = useSearchParams(); // Add this hook (import from react-router-dom)
+    const encryptedId = searchParams.get("id") || "";
+    // Decrypt the ID immediately
+    const id = decryptId(encryptedId);
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
 
     useEffect(() => {
@@ -72,7 +77,7 @@ export const ProfileDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
     );
 };
 
-export const useProfileData  = () => {
+export const useProfileData = () => {
     const context = useContext(ProfileDataContext);
     if (!context) {
         throw new Error('ProfileDataProvider must be used within a ProfileDataProvider');

@@ -19,6 +19,7 @@ import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 import { Hearts } from "react-loader-spinner";
+import { encryptId } from "../../../utils/cryptoUtils";
 
 // Define the interface for the profile data
 interface ProfileData {
@@ -171,7 +172,7 @@ export const VysAssistCard: React.FC<VysassistCardProps> = ({ pageNumber, sortBy
     const handleProfileClick = async (profileId: string) => {
         if (activeProfileId) return;
         setActiveProfileId(profileId); // set the card that's loading
-
+        const secureId = encryptId(profileId);
         const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
         let page_id = "2";
 
@@ -195,7 +196,7 @@ export const VysAssistCard: React.FC<VysassistCardProps> = ({ pageNumber, sortBy
                 return;
             }
             // Navigate after validation
-            navigate(`/ProfileDetails?id=${profileId}&rasi=1&sortBy=${sortBy}`, {
+            navigate(`/ProfileDetails?id=${secureId}&rasi=1&sortBy=${sortBy}`, {
                 state: {
                     from: 'VysAssit',
                     pageNumber: pageNumber, // Pass the current page number

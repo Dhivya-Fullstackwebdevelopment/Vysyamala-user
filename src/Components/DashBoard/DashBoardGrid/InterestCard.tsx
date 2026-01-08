@@ -7,6 +7,7 @@ import ReceivedInterestImg from "../../../assets/images/ReceivedInterest.png"
 import { ToastNotification, NotifySuccess, NotifyError } from "../../Toast/ToastNotification";
 import { toast } from 'react-toastify';
 import apiClient from '../../../API';
+import { encryptId } from '../../../utils/cryptoUtils';
 
 interface Profile {
     int_profileid: string;
@@ -93,7 +94,8 @@ export const InterestCard: React.FC<InterestProfilesCardProps> = ({ pageNumber }
     //     navigate(`/profiledetails?id=${profileId}&interest=1`,);
     // };
     const handleProfileClick = (profileId: string) => {
-        navigate(`/profiledetails?id=${profileId}&interest=1`, {
+        const secureId = encryptId(profileId);
+        navigate(`/profiledetails?id=${secureId}&interest=1`, {
             state: {
                 from: 'viewedProfiles',
                 pageNumber: pageNumber // Pass the current page number

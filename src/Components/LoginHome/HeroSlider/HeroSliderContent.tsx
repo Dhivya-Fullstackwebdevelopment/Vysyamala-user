@@ -7,6 +7,7 @@ import { FaPersonArrowUpFromLine } from "react-icons/fa6";
 import Slider from "react-slick";
 import apiClient from "../../../API";
 import { Hearts } from "react-loader-spinner";
+import { encryptId } from "../../../utils/cryptoUtils";
 
 // Define interface for profile data
 
@@ -107,8 +108,10 @@ export const HeroSliderContent = () => {
   }, [loginuser_profileId]);
 
 
+  
   const handleClick = (profileId: string) => {
-    const url = `/profiledetails?id=${profileId}&interest=1`;
+    const secureId = encryptId(profileId);
+    const url = `/profiledetails?id=${secureId}&interest=1`;
     // window.open(url, '_blank');
     window.location.href = url; // Navigate to the URL in the same tab
   };

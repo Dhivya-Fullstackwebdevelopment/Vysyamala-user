@@ -17,6 +17,7 @@ import apiClient from "../../../../API";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { Hearts } from "react-loader-spinner";
+import { encryptId } from "../../../../utils/cryptoUtils";
 // import { toast } from "react-toastify";
 // import { ToastNotification } from "../../../Toast/ToastNotification";
 
@@ -125,6 +126,7 @@ export const GridListCard: React.FC<GridListCardProps> = ({ profile }) => {
         return;
       }
       // Get current page number from URL
+      const secureId = encryptId(profile.profile_id);
       const searchParams = new URLSearchParams(window.location.search);
       const pageFromUrl = searchParams.get('page');
       const currentPage = pageFromUrl ? parseInt(pageFromUrl) : 1;
@@ -141,7 +143,7 @@ export const GridListCard: React.FC<GridListCardProps> = ({ profile }) => {
         searchValue: sessionStorage.getItem('searchvalue') || ''
       };
       // If successful, create profile visit and navigate
-      navigate(`/ProfileDetails?id=${profile.profile_id}&rasi=1&order_by=${currentSortOrder}`, {
+      navigate(`/ProfileDetails?id=${secureId}&rasi=1&order_by=${currentSortOrder}`, {
         state: {
           from: ["LoginHome", "SearchProfiles"],
           pageNumber: currentPage,

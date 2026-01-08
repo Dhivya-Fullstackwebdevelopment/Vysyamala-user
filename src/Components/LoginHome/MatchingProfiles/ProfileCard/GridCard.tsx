@@ -10,6 +10,7 @@ import apiClient from "../../../../API";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { Hearts } from "react-loader-spinner";
+import { encryptId } from "../../../../utils/cryptoUtils";
 
 // import { toast } from "react-toastify";
 
@@ -38,7 +39,7 @@ export const GridCard: React.FC<GridCardProps> = ({ profile }) => {
   //   );
   //   setIsBookmarked(isBookmarked);
   // }, [profile.profile_id]);
-  
+
   useEffect(() => {
     if (profile) {
       // Set the initial bookmark state based on the 'wish_list' property
@@ -113,7 +114,7 @@ export const GridCard: React.FC<GridCardProps> = ({ profile }) => {
         return;
       }
 
-
+      const secureId = encryptId(profile.profile_id);
       const searchParams = new URLSearchParams(window.location.search);
       const pageFromUrl = searchParams.get('page');
       const currentPage = pageFromUrl ? parseInt(pageFromUrl) : 1;
@@ -130,7 +131,7 @@ export const GridCard: React.FC<GridCardProps> = ({ profile }) => {
         searchValue: sessionStorage.getItem('searchvalue') || ''
       };
       // If successful, create profile visit and navigate
-      navigate(`/ProfileDetails?id=${profile.profile_id}&rasi=1&order_by=${currentSortOrder}`, {
+      navigate(`/ProfileDetails?id=${secureId}&rasi=1&order_by=${currentSortOrder}`, {
         state: {
           from: ["LoginHome", "SearchProfiles"],
           pageNumber: currentPage, // Pass the current page number

@@ -19,6 +19,7 @@ import apiClient from "../../API";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { Hearts } from "react-loader-spinner";
+import { encryptId } from "../../utils/cryptoUtils";
 
 // Define the shape of your wishlist profile
 interface WishlistProfile {
@@ -134,7 +135,7 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
   const handleProfileClick = async (profileId: string) => {
     if (activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
-
+    const secureId = encryptId(profileId);
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
     let page_id = "2";
 
@@ -161,7 +162,7 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
       // Navigate after validation
       // navigate(`/ProfileDetails?id=${profileId}&rasi=1`);
       // navigate(`/ProfileDetails?id=${profileId}&page=2&from=wishlist`);
-      navigate(`/ProfileDetails?id=${profileId}&page=2&sortBy=${sortBy}`, {
+      navigate(`/ProfileDetails?id=${secureId}&page=2&sortBy=${sortBy}`, {
         state: {
           from: 'Wishlist',
           pageNumber: page,

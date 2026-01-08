@@ -23,6 +23,7 @@ import apiClient from "../../../API";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { Hearts } from "react-loader-spinner";
+import { encryptId } from "../../../utils/cryptoUtils";
 
 // Define the profile and API response types
 interface Profile {
@@ -182,7 +183,7 @@ export const MyVisitorsCard: React.FC<VisitorsProfilesCardProps> = ({ pageNumber
   const handleProfileClick = async (profileId: string) => {
     if (activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
-
+    const secureId = encryptId(profileId);
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
     let page_id = "2";
 
@@ -207,7 +208,7 @@ export const MyVisitorsCard: React.FC<VisitorsProfilesCardProps> = ({ pageNumber
       }
 
       // Navigate after validation
-      navigate(`/ProfileDetails?id=${profileId}&page=5&sortBy=${sortBy}`, {
+      navigate(`/ProfileDetails?id=${secureId}&page=5&sortBy=${sortBy}`, {
         state: {
           from: 'myVisitors',
           pageNumber: pageNumber,
@@ -248,7 +249,7 @@ export const MyVisitorsCard: React.FC<VisitorsProfilesCardProps> = ({ pageNumber
 
   return (
     <div>
-      <ToastContainer/>
+      <ToastContainer />
       {profiles.map((profile) => (
         <div
           key={profile.viwed_profileid}

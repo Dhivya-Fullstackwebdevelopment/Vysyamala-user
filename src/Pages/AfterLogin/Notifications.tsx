@@ -7,6 +7,7 @@ import Spinner from "../../Components/Spinner";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../../API";
 import { toast } from "react-toastify";
+import { encryptId } from "../../utils/cryptoUtils";
 
 export const Notifications = () => {
   const context = useContext(ProfileContext);
@@ -321,7 +322,8 @@ export const Notifications = () => {
                         // onClick={() => navigate(`/ProfileDetails?id=${data.from_profile_id}`)}
                         onClick={() => {
                           markNotificationRead(data.id);
-                          navigate(`/ProfileDetails?id=${data.from_profile_id}`);
+                          const secureId = encryptId(data.from_profile_id);
+                          navigate(`/ProfileDetails?id=${secureId}`);
                         }}
                       >
                         View Profile

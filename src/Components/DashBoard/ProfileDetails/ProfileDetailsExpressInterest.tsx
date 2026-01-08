@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, } from "react";
 import axios, { AxiosResponse } from "axios";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { MdArrowDropDown, MdLocalPrintshop, MdMessage, MdVerifiedUser } from "react-icons/md";
 import { MdBookmark, MdBookmarkBorder } from "react-icons/md";
 import AgeIcon from "../../../assets/icons/ageIcon.png";
@@ -26,6 +26,7 @@ import apiClient from "../../../API";
 import { Hearts } from 'react-loader-spinner'
 import { ReUseUpGradePopup } from "../ReUsePopup/ReUseUpGradePopup";
 import { GenderRestrictionPopup } from "../ReUsePopup/GenderRestrictionPopup";
+import { decryptId } from "../../../utils/cryptoUtils";
 
 // Define the interfaces for profile data
 interface HoroscopeDetails {
@@ -105,12 +106,24 @@ export const ProfileDetailsExpressInterest: React.FC<
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const interestParam = queryParams.get("interest");
-  const idparam = queryParams.get("id") || "";
+  // const idparam = queryParams.get("id") || "";
+  const [searchParams] = useSearchParams(); // Add this hook (import from react-router-dom)
+  const encryptedId = searchParams.get("id") || "";
+  // Decrypt the ID immediately
+  const idparam = decryptId(encryptedId);
   const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
   const custom_message = localStorage.getItem("custom_message");
   const storedPlanId = sessionStorage.getItem("plan_id");
   ////console.log("vysya", storedPlanId);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!idparam && encryptedId) {
+      console.error("Invalid Profile ID");
+      toast.error("Invalid Profile ID");
+      navigate(-1);
+    }
+  }, [idparam, encryptedId, navigate]);
 
   useEffect(() => {
     // Check if user is authenticated

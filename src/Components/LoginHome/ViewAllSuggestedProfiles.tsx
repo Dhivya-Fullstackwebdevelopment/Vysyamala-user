@@ -18,6 +18,7 @@ import { ProfileContext } from "../../ProfileContext";
 import apiClient from '../../API';
 import { Hearts } from 'react-loader-spinner';
 import { toast } from 'react-toastify';
+import { encryptId } from '../../utils/cryptoUtils';
 // Define the shape of your profile data
 interface Profile {
   profile_id: string;
@@ -109,7 +110,7 @@ export const ViewAllSuggestedProfiles: React.FC = () => {
   const handleProfileClick = async (profileId: string) => {
     if (activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
-
+    const secureId = encryptId(profileId);
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
     let page_id = "2";
 
@@ -134,7 +135,7 @@ export const ViewAllSuggestedProfiles: React.FC = () => {
       }
 
       // Navigate after validation
-      navigate(`/ProfileDetails?id=${profileId}&rasi=1`);
+      navigate(`/ProfileDetails?id=${secureId}&rasi=1`);
     } catch (error) {
       toast.error("Error accessing profile.");
       console.error("API Error:", error);

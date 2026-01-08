@@ -13,6 +13,7 @@ import { FiLogOut } from "react-icons/fi";
 //import axios from "axios";
 import apiClient from "../API";
 import { toast } from "react-toastify";
+import { encryptId } from "../utils/cryptoUtils";
 
 export interface Notification {
   notify_img: string | undefined;
@@ -618,7 +619,8 @@ export const LoginHeader: React.FC = () => {
                                       className="text-main rounded-md border-[2px] border-main px-2 py-1"
                                       onClick={() => {
                                         markNotificationRead(notification.id);  // 🔥 mark as read
-                                        navigate(`/ProfileDetails?id=${notification.from_profile_id}`); // go to profile
+                                        const secureId = encryptId(notification.from_profile_id);
+                                        navigate(`/ProfileDetails?id=${secureId}`); // go to profile
                                         //  setIsNotificationVisible(false); // close dropdown (optional)
                                       }}
                                     >

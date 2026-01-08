@@ -140,6 +140,7 @@ import { useNavigate } from 'react-router-dom';
 import { AccountSetup } from '../PopUpsReg/AccountSetup';
 import { BasicDetails } from '../PopUpsReg/BasicDetails';
 import { OtpVerification } from '../PopUpsReg/OtpVerification';
+import { encryptId } from '../../../utils/cryptoUtils';
 
 
 
@@ -208,8 +209,9 @@ export const LoginPopupModal: React.FC<LoginPopupModalProps> = ({ onClose }) => 
             }
 
             if (selectedPrefix !== loggedInPrefix) {
+                const secureId = encryptId(selectedProfileId);
                 // ✅ Opposite gender → show profile
-                navigate(`/ProfileDetails?id=${selectedProfileId}&rasi=1`);
+                navigate(`/ProfileDetails?id=${secureId}&rasi=1`);
             } else {
                 // ❌ Same gender → go to LoginHome
                 navigate("/LoginHome");

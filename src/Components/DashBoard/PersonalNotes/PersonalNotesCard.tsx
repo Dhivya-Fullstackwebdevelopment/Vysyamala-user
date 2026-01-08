@@ -11,6 +11,7 @@ import apiClient from "../../../API";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { Hearts } from "react-loader-spinner";
+import { encryptId } from "../../../utils/cryptoUtils";
 
 interface GetProfListMatch {
   profile_id: string;
@@ -158,7 +159,7 @@ export const PersonalNotesCard: React.FC<PersonalNotesCardProps> = ({ pageNumber
   const handleProfileClick = async (profileId: string) => {
     if (isLoading) return;
     setIsLoading(true);
-
+    const secureId = encryptId(profileId);
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
 
     let page_id = "2"; // Default
@@ -184,7 +185,7 @@ export const PersonalNotesCard: React.FC<PersonalNotesCardProps> = ({ pageNumber
 
       // If successful, create profile visit and navigate
       // If successful, navigate with pageNumber in state
-      navigate(`/ProfileDetails?id=${profileId}&rasi=1&sortBy=${sortBy}`, {
+      navigate(`/ProfileDetails?id=${secureId}&rasi=1&sortBy=${sortBy}`, {
         state: {
           from: 'PersonalNotes',
           pageNumber: pageNumber,

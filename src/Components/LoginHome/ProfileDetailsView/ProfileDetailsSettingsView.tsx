@@ -10,9 +10,10 @@ import { EducationProfessionView } from './EducationProfessionView';
 import { FamilyView } from './FamilyView';
 import { HoroscopeView } from './HoroscopeView';
 import { ContactView } from './ContactView';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { FaRegListAlt } from 'react-icons/fa';
 import { ProfileDataProvider } from './ViewApicall/ProfileDataProvider';
+import { decryptId, encryptId } from '../../../utils/cryptoUtils';
 
 
 interface ProfileDetailsSettingsViewProps { }
@@ -31,7 +32,12 @@ export const ProfileDetailsSettingsView: React.FC<ProfileDetailsSettingsViewProp
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const pageid = queryParams.get("page") || "";
-    const currentProfileId = queryParams.get("id") || "";
+    // const currentProfileId = queryParams.get("id") || "";
+    const [searchParams] = useSearchParams(); // Add this hook (import from react-router-dom)
+    const encryptedId = searchParams.get("id") || "";
+    // Decrypt the ID immediately
+    const currentProfileId = decryptId(encryptedId);
+
     const sortBy = queryParams.get("sortBy") || "datetime";
     const orderBy = queryParams.get("order_by") || "1"; // Get order_by from URL
 
@@ -150,11 +156,15 @@ export const ProfileDetailsSettingsView: React.FC<ProfileDetailsSettingsViewProp
         if (currentIndex > 0) {
             console.log("within")
             const newIndex = currentIndex - 1;
+            const rawId = profileIds[newIndex];
+
+            // 1. Encrypt the raw ID from your array
+            const secureId = encryptId(rawId);
             setCurrentIndex(newIndex);
             // navigate(`/ProfileDetails?id=${profileIds[newIndex]}&page=${pageid}&sortBy=${sortBy}`);
             const newUrl = pageid
-                ? `/ProfileDetails?id=${profileIds[newIndex]}&page=${pageid}&sortBy=${sortBy}`
-                : `/ProfileDetails?id=${profileIds[newIndex]}&rasi=1&order_by=${orderBy}`;
+                ? `/ProfileDetails?id=${secureId}&page=${pageid}&sortBy=${sortBy}`
+                : `/ProfileDetails?id=${secureId}&rasi=1&order_by=${orderBy}`;
             navigate(newUrl);
             setTimeout(() => {
                 window.scrollTo(0, 0);  // Move scroll to the top after navigation
@@ -165,12 +175,16 @@ export const ProfileDetailsSettingsView: React.FC<ProfileDetailsSettingsViewProp
     const handleNext = () => {
         if (currentIndex < profileIds.length - 1) {
             const newIndex = currentIndex + 1;
+            const rawId = profileIds[newIndex];
+
+            // 1. Encrypt the raw ID from your array
+            const secureId = encryptId(rawId);
             //console.log("Navigating to next profile, New Index:", newIndex); // Debugging log
             setCurrentIndex(newIndex);
             // navigate(`/ProfileDetails?id=${profileIds[newIndex]}&page=${pageid}&sortBy=${sortBy}`);
             const newUrl = pageid
-                ? `/ProfileDetails?id=${profileIds[newIndex]}&page=${pageid}&sortBy=${sortBy}`
-                : `/ProfileDetails?id=${profileIds[newIndex]}&rasi=1&order_by=${orderBy}`;
+                ? `/ProfileDetails?id=${secureId}&page=${pageid}&sortBy=${sortBy}`
+                : `/ProfileDetails?id=${secureId}&rasi=1&order_by=${orderBy}`;
             navigate(newUrl);
             setTimeout(() => {
                 window.scrollTo(0, 0);  // Move scroll to the top after navigation

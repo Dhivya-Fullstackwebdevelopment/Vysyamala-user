@@ -60,6 +60,7 @@ import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import apiClient from "../../../API";
 import { Hearts } from "react-loader-spinner";
+import { encryptId } from "../../../utils/cryptoUtils";
 
 interface FeaturedProfileCardProps {
   profileName: string;
@@ -83,7 +84,7 @@ export const FeaturedProfileCard: React.FC<FeaturedProfileCardProps> = ({
   const handleProfileClick = async (profileId: string) => {
     if (activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
-
+    const secureId = encryptId(profileId);
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
     let page_id = "2";
 
@@ -104,7 +105,7 @@ export const FeaturedProfileCard: React.FC<FeaturedProfileCardProps> = ({
       }
 
       // Navigate after validation
-      navigate(`/ProfileDetails?id=${profileId}&rasi=1`);
+      navigate(`/ProfileDetails?id=${secureId}&rasi=1`);
     } catch (error) {
       toast.error("Error accessing profile.");
       console.error("API Error:", error);
@@ -115,10 +116,10 @@ export const FeaturedProfileCard: React.FC<FeaturedProfileCardProps> = ({
 
   const gender = localStorage.getItem("gender");
 
-const defaultImgUrl =
-  gender?.toLowerCase() === "male"
-    ? "https://vysyamat.blob.core.windows.net/vysyamala/default_bride.png"
-    : "https://vysyamat.blob.core.windows.net/vysyamala/default_groom.png";
+  const defaultImgUrl =
+    gender?.toLowerCase() === "male"
+      ? "https://vysyamat.blob.core.windows.net/vysyamala/default_bride.png"
+      : "https://vysyamat.blob.core.windows.net/vysyamala/default_groom.png";
 
 
   return (

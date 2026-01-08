@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { Hearts } from "react-loader-spinner";
+import { encryptId } from "../../../utils/cryptoUtils";
 
 
 interface GalleryCardProps {
@@ -12,7 +13,7 @@ interface GalleryCardProps {
   pageNumber: number; // Add this prop
 }
 
-const GalleryCard: React.FC<GalleryCardProps> = ({ profiles,pageNumber }) => {
+const GalleryCard: React.FC<GalleryCardProps> = ({ profiles, pageNumber }) => {
   const navigate = useNavigate()
   const [loadingProfileId, setLoadingProfileId] = useState<string | null>(null);
   //const location = useLocation();
@@ -20,7 +21,7 @@ const GalleryCard: React.FC<GalleryCardProps> = ({ profiles,pageNumber }) => {
   const handleProfileClick = async (profileId: string) => {
     if (loadingProfileId) return;
     setLoadingProfileId(profileId);
-
+    const secureId = encryptId(profileId);
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
 
     try {
@@ -35,7 +36,7 @@ const GalleryCard: React.FC<GalleryCardProps> = ({ profiles,pageNumber }) => {
         return;
       }
 
-      navigate(`/ProfileDetails?id=${profileId}&rasi=1`,{
+      navigate(`/ProfileDetails?id=${secureId}&rasi=1`, {
         state: {
           from: 'Gallery',
           pageNumber: pageNumber // Pass the current page number

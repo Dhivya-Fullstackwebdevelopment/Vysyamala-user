@@ -14,6 +14,7 @@ import { ToastContainer, toast } from "react-toastify"; // Import ToastContainer
 import "react-toastify/dist/ReactToastify.css"; // Import the CSS for react-toastify
 import apiClient from "../../../API";
 import { Hearts } from "react-loader-spinner";
+import { encryptId } from "../../../utils/cryptoUtils";
 
 // Define the Profile interface
 export interface Profile {
@@ -271,7 +272,7 @@ export const InterestSentCard: React.FC<InterestSentCardProps> = ({ pageNumber, 
   const handleProfileClick = async (profileId: string) => {
     if (activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
-
+    const secureId = encryptId(profileId);
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
     let page_id = "2";
 
@@ -297,7 +298,7 @@ export const InterestSentCard: React.FC<InterestSentCardProps> = ({ pageNumber, 
 
       // Navigate after validation
       //navigate(`/ProfileDetails?id=${profileId}&page=3`);
-      navigate(`/Profiledetails?id=${profileId}&page=3&sortBy=${sortBy}`, {
+      navigate(`/Profiledetails?id=${secureId}&page=3&sortBy=${sortBy}`, {
         state: {
           from: 'interestSent',
           pageNumber: pageNumber, // Pass the current page number

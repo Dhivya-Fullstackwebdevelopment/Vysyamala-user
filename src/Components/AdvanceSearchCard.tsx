@@ -17,6 +17,7 @@ import { MdBookmark, MdBookmarkBorder } from "react-icons/md";
 // import MatchingScoreImg from "../../../../assets/images/MatchingScore.png";
 import { useNavigate } from "react-router-dom";
 import MatchingScore from "./DashBoard/ProfileDetails/MatchingScore";
+import { encryptId } from "../utils/cryptoUtils";
 
 const AdvanceSearchCard = () => {
   const context = useContext(ProfileContext);
@@ -45,7 +46,8 @@ const AdvanceSearchCard = () => {
   // console.log(searchProfileData[0].profile_id, "sssss");
   const navigate = useNavigate();
   const routToProfileDetail = () => {
-    navigate(`/ProfileDetails?id=${searchProfileData[0]?.profile_id}`);
+    const secureId = encryptId(searchProfileData[0]?.profile_id);
+    navigate(`/ProfileDetails?id=${secureId}`);
   };
 
   //console.log(searchProfileData[0]?.matching_score, "lll");

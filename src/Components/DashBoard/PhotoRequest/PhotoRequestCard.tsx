@@ -34,6 +34,8 @@ import apiClient from "../../../API";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { Hearts } from "react-loader-spinner";
+import { encryptId } from "../../../utils/cryptoUtils";
+
 
 interface PhotoRequestData {
   req_Profile_img: string;
@@ -346,7 +348,7 @@ const PhotoRequestCard = ({
   const handleProfileClick = async (profileId: string, sortBy: string) => {
     if (activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
-
+    const secureId = encryptId(profileId);
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
     let page_id = "2";
 
@@ -370,7 +372,7 @@ const PhotoRequestCard = ({
         return;
       }
       // Navigate after validation
-      navigate(`/ProfileDetails?id=${profileId}&page=6&sortBy=${sortBy}`);
+      navigate(`/ProfileDetails?id=${secureId}&page=6&sortBy=${sortBy}`);
     } catch (error) {
       toast.error("Error accessing profile.");
       console.error("API Error:", error);

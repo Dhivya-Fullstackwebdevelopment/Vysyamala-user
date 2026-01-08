@@ -93,6 +93,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import apiClient from "../../../API";
 import { Hearts } from "react-loader-spinner";
+import { encryptId } from "../../../utils/cryptoUtils";
 
 interface SuggestedCardProps {
   profileImg?: string;
@@ -133,7 +134,7 @@ export const SuggestedCard: React.FC<SuggestedCardProps> = ({
   const handleProfileClick = async (profileId: string) => {
     if (activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
-
+    const secureId = encryptId(profileId);
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
     let page_id = "2";
 
@@ -154,7 +155,7 @@ export const SuggestedCard: React.FC<SuggestedCardProps> = ({
       }
 
       // Navigate after validation
-      navigate(`/ProfileDetails?id=${profileId}&rasi=1`);
+      navigate(`/ProfileDetails?id=${secureId}&rasi=1`);
     } catch (error) {
       toast.error("Error accessing profile.");
       console.error("API Error:", error);
@@ -162,13 +163,13 @@ export const SuggestedCard: React.FC<SuggestedCardProps> = ({
       setActiveProfileId(null); // reset loading
     }
   };
- 
+
   const gender = localStorage.getItem("gender");
 
-const defaultImgUrl =
-  gender?.toLowerCase() === "male"
-    ? "https://vysyamat.blob.core.windows.net/vysyamala/default_bride.png"
-    : "https://vysyamat.blob.core.windows.net/vysyamala/default_groom.png";
+  const defaultImgUrl =
+    gender?.toLowerCase() === "male"
+      ? "https://vysyamat.blob.core.windows.net/vysyamala/default_bride.png"
+      : "https://vysyamat.blob.core.windows.net/vysyamala/default_groom.png";
 
 
   return (
@@ -179,12 +180,12 @@ const defaultImgUrl =
     >
       <div className="mb-3 !h-auto ">
         {profileImg ? (
-          <img src={profileImg || defaultImgUrl} alt="Profile" 
-           onError={(e) => {
-                  e.currentTarget.onerror = null; // Prevent infinite loop
-                  e.currentTarget.src = defaultImgUrl; // Set default image
-                }}
-          className="w-full h-[260px] object-cover object-top" />
+          <img src={profileImg || defaultImgUrl} alt="Profile"
+            onError={(e) => {
+              e.currentTarget.onerror = null; // Prevent infinite loop
+              e.currentTarget.src = defaultImgUrl; // Set default image
+            }}
+            className="w-full h-[260px] object-cover object-top" />
         ) : (
           <div className="w-full h-40 bg-gray-200 flex items-center justify-center">
             <span className="text-gray-500">No Image</span>

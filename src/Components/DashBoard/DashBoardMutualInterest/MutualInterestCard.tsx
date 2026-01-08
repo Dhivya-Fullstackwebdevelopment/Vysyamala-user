@@ -11,6 +11,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import apiClient from "../../../API";
 import { Hearts } from "react-loader-spinner";
+import { encryptId } from "../../../utils/cryptoUtils";
 
 // Define the Profile interface
 export interface Profile {
@@ -62,16 +63,16 @@ export const MutualInterestCard: React.FC<MutualInterestCardProps> = ({
   const handleBookmarkToggle = async (profileId: string, currentWishListStatus: number) => {
     // Prevent multiple clicks while updating
     if (updatingBookmarks.has(profileId)) return;
-    
+
     const newStatus = isBookmarked(currentWishListStatus) ? 0 : 1;
 
     // Optimistically update UI
-    setProfiles(prev => prev.map(profile => 
-      profile.mutint_profileid === profileId 
+    setProfiles(prev => prev.map(profile =>
+      profile.mutint_profileid === profileId
         ? { ...profile, mutint_profile_wishlist: newStatus }
         : profile
     ));
-    
+
     setUpdatingBookmarks(prev => new Set(prev.add(profileId)));
 
     try {
@@ -83,7 +84,7 @@ export const MutualInterestCard: React.FC<MutualInterestCardProps> = ({
           status: newStatus.toString(),
         }
       );
-      
+
       if (response.data.Status === 1) {
         if (newStatus === 1) {
           toast.success("Profile added to wishlist!");
@@ -92,8 +93,8 @@ export const MutualInterestCard: React.FC<MutualInterestCardProps> = ({
         }
       } else {
         // Revert on failure
-        setProfiles(prev => prev.map(profile => 
-          profile.mutint_profileid === profileId 
+        setProfiles(prev => prev.map(profile =>
+          profile.mutint_profileid === profileId
             ? { ...profile, mutint_profile_wishlist: currentWishListStatus }
             : profile
         ));
@@ -101,8 +102,8 @@ export const MutualInterestCard: React.FC<MutualInterestCardProps> = ({
       }
     } catch (error) {
       // Revert on error
-      setProfiles(prev => prev.map(profile => 
-        profile.mutint_profileid === profileId 
+      setProfiles(prev => prev.map(profile =>
+        profile.mutint_profileid === profileId
           ? { ...profile, mutint_profile_wishlist: currentWishListStatus }
           : profile
       ));
@@ -210,7 +211,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   const handleProfileClick = async (profileId: string, sortBy: string) => {
     if (activeProfileId) return;
     setActiveProfileId(profileId);
-
+    const secureId = encryptId(profileId);
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
     let page_id = "2";
 
@@ -238,7 +239,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
       const pageFromUrl = searchParams.get('page');
       const currentPage = pageFromUrl ? parseInt(pageFromUrl) : 1;
 
-      navigate(`/ProfileDetails?id=${profileId}&page=1&sortBy=${sortBy}`, {
+      navigate(`/ProfileDetails?id=${secureId}&page=1&sortBy=${sortBy}`, {
         state: {
           from: 'MutualInterest',
           pageNumber: currentPage,
@@ -285,16 +286,14 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
             {isBookmarked ? (
               <MdBookmark
                 onClick={onBookmarkToggle}
-                className={`absolute top-2 right-2 text-white text-[22px] cursor-pointer ${
-                  isUpdating ? 'opacity-50' : ''
-                }`}
+                className={`absolute top-2 right-2 text-white text-[22px] cursor-pointer ${isUpdating ? 'opacity-50' : ''
+                  }`}
               />
             ) : (
               <MdBookmarkBorder
                 onClick={onBookmarkToggle}
-                className={`absolute top-2 right-2 text-white text-[22px] cursor-pointer ${
-                  isUpdating ? 'opacity-50' : ''
-                }`}
+                className={`absolute top-2 right-2 text-white text-[22px] cursor-pointer ${isUpdating ? 'opacity-50' : ''
+                  }`}
               />
             )}
           </div>

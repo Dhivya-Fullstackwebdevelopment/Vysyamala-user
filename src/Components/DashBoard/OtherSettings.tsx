@@ -133,7 +133,7 @@ export const OtherSettings: React.FC<OtherSettingsProps> = ({
                     <BiSolidUserCircle className="text-[22px] mr-2 max-sm:text-base " />
                     Profile Visibility
                   </li>)} */}
-                {planID === "3" || planID === "17" && (
+               {(planID === "3" || planID === "17") && (
                   <li
                     className={`flex items-center text-[20px] text-white cursor-pointer max-xl:text-[18px] max-lg:w-2/5 max-md:w-2/4 max-sm:w-full max-sm:text-[16px] 
                                  ${activeSection === "ProfileVisibility"
