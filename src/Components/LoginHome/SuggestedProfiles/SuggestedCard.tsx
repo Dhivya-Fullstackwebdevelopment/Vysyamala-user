@@ -94,6 +94,7 @@ import { toast } from "react-toastify";
 import apiClient from "../../../API";
 import { Hearts } from "react-loader-spinner";
 import { encryptId } from "../../../utils/cryptoUtils";
+import PlatinumModal from "../../DashBoard/ReUsePopup/PlatinumModalPopup";
 
 interface SuggestedCardProps {
   profileImg?: string;
@@ -122,6 +123,7 @@ export const SuggestedCard: React.FC<SuggestedCardProps> = ({
 
   // State to track if the card is bookmarked or not
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isPlatinumModalOpen, setIsPlatinumModalOpen] = useState(false);
 
   const handleBookmark = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -131,7 +133,9 @@ export const SuggestedCard: React.FC<SuggestedCardProps> = ({
   const navigate = useNavigate();
   const [activeProfileId, setActiveProfileId] = useState<string | null>(null);
 
+
   const handleProfileClick = async (profileId: string) => {
+    if (isPlatinumModalOpen) return;
     if (activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
     const secureId = encryptId(profileId);
@@ -148,16 +152,35 @@ export const SuggestedCard: React.FC<SuggestedCardProps> = ({
         }
       );
 
+      // if (checkResponse.data.status === "failure") {
+      //   toast.error(checkResponse.data.message || "Limit reached to view profile");
+      //   setActiveProfileId(null);
+      //   return;
+      // }
+
       if (checkResponse.data.status === "failure") {
-        toast.error(checkResponse.data.message || "Limit reached to view profile");
-        setActiveProfileId(null);
+        if (checkResponse.data.message === "Profile visibility restricted") {
+          setIsPlatinumModalOpen(true);
+        } else {
+          toast.error(checkResponse.data.message || "Limit reached to view profile");
+        }
         return;
       }
 
       // Navigate after validation
       navigate(`/ProfileDetails?id=${secureId}&rasi=1`);
-    } catch (error) {
-      toast.error("Error accessing profile.");
+    } catch (error: any) {
+      // toast.error("Error accessing profile.");
+      // console.error("API Error:", error);
+      const serverMessage = error.response?.data?.message;
+
+      if (serverMessage === "Profile visibility restricted") {
+        setIsPlatinumModalOpen(true);
+      } else {
+        // Only show the toast if it's NOT the visibility restriction
+        toast.error(serverMessage || "Error accessing profile.");
+        console.error("API Error:", error);
+      }
       console.error("API Error:", error);
     } finally {
       setActiveProfileId(null); // reset loading
@@ -228,6 +251,10 @@ export const SuggestedCard: React.FC<SuggestedCardProps> = ({
           className="absolute top-5 right-5 text-white text-[22px] fill-[#72727240] cursor-pointer"
         />
       )}
+      <PlatinumModal
+        isOpen={isPlatinumModalOpen}
+        onClose={() => setIsPlatinumModalOpen(false)}
+      />
     </div>
   );
 };

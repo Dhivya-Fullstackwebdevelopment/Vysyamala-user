@@ -24,6 +24,7 @@ import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { Hearts } from "react-loader-spinner";
 import { encryptId } from "../../../utils/cryptoUtils";
+import PlatinumModal from "../ReUsePopup/PlatinumModalPopup";
 
 // Define the profile and API response types
 interface Profile {
@@ -68,7 +69,7 @@ export const MyVisitorsCard: React.FC<VisitorsProfilesCardProps> = ({ pageNumber
   const [activeProfileId, setActiveProfileId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const location = useLocation();
-
+  const [isPlatinumModalOpen, setIsPlatinumModalOpen] = useState(false);
   // Function to handle the bookmark toggle
   // const handleBookmark = (profileId: string) => {
   //   setIsBookmarked((prev) => ({
@@ -181,6 +182,7 @@ export const MyVisitorsCard: React.FC<VisitorsProfilesCardProps> = ({ pageNumber
   // };
 
   const handleProfileClick = async (profileId: string) => {
+    if (isPlatinumModalOpen) return; if (isPlatinumModalOpen) return;
     if (activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
     const secureId = encryptId(profileId);
@@ -201,9 +203,17 @@ export const MyVisitorsCard: React.FC<VisitorsProfilesCardProps> = ({ pageNumber
         }
       );
 
+      // if (checkResponse.data.status === "failure") {
+      //   toast.error(checkResponse.data.message || "Limit reached to view profile");
+      //   setActiveProfileId(null);
+      //   return;
+      // }
       if (checkResponse.data.status === "failure") {
-        toast.error(checkResponse.data.message || "Limit reached to view profile");
-        setActiveProfileId(null);
+        if (checkResponse.data.message === "Profile visibility restricted") {
+          setIsPlatinumModalOpen(true);
+        } else {
+          toast.error(checkResponse.data.message || "Limit reached to view profile");
+        }
         return;
       }
 
@@ -215,8 +225,18 @@ export const MyVisitorsCard: React.FC<VisitorsProfilesCardProps> = ({ pageNumber
           sortBy: sortBy
         }
       });
-    } catch (error) {
-      toast.error("Error accessing profile.");
+    } catch (error: any) {
+      // toast.error("Error accessing profile.");
+      // console.error("API Error:", error);
+      const serverMessage = error.response?.data?.message;
+
+      if (serverMessage === "Profile visibility restricted") {
+        setIsPlatinumModalOpen(true);
+      } else {
+        // Only show the toast if it's NOT the visibility restriction
+        toast.error(serverMessage || "Error accessing profile.");
+        console.error("API Error:", error);
+      }
       console.error("API Error:", error);
     } finally {
       setActiveProfileId(null); // reset loading
@@ -412,6 +432,10 @@ export const MyVisitorsCard: React.FC<VisitorsProfilesCardProps> = ({ pageNumber
           </div>
         </div>
       ))}
+      <PlatinumModal
+        isOpen={isPlatinumModalOpen}
+        onClose={() => setIsPlatinumModalOpen(false)}
+      />
     </div>
   );
 };

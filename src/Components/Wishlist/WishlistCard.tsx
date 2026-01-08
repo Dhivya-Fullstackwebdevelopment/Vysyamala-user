@@ -20,6 +20,7 @@ import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { Hearts } from "react-loader-spinner";
 import { encryptId } from "../../utils/cryptoUtils";
+import PlatinumModal from "../DashBoard/ReUsePopup/PlatinumModalPopup";
 
 // Define the shape of your wishlist profile
 interface WishlistProfile {
@@ -62,6 +63,7 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
   const [bookmarkedProfiles, setBookmarkedProfiles] = useState<string[]>([]);
+  const [isPlatinumModalOpen, setIsPlatinumModalOpen] = useState(false);
 
   const fetchWishlistProfiles = async (profileId: string) => {
     setIsLoading(true); // Start loading
@@ -133,6 +135,7 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
   const location = useLocation();
 
   const handleProfileClick = async (profileId: string) => {
+    if (isPlatinumModalOpen) return;
     if (activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
     const secureId = encryptId(profileId);
@@ -153,9 +156,18 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
         }
       );
 
+      // if (checkResponse.data.status === "failure") {
+      //   toast.error(checkResponse.data.message || "Limit reached to view profile");
+      //   setActiveProfileId(null);
+      //   return;
+      // }
+
       if (checkResponse.data.status === "failure") {
-        toast.error(checkResponse.data.message || "Limit reached to view profile");
-        setActiveProfileId(null);
+        if (checkResponse.data.message === "Profile visibility restricted") {
+          setIsPlatinumModalOpen(true);
+        } else {
+          toast.error(checkResponse.data.message || "Limit reached to view profile");
+        }
         return;
       }
 
@@ -169,8 +181,18 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
           sortBy: sortBy
         }
       });
-    } catch (error) {
-      toast.error("Error accessing profile.");
+    } catch (error: any) {
+      // toast.error("Error accessing profile.");
+      // console.error("API Error:", error);
+      const serverMessage = error.response?.data?.message;
+
+      if (serverMessage === "Profile visibility restricted") {
+        setIsPlatinumModalOpen(true);
+      } else {
+        // Only show the toast if it's NOT the visibility restriction
+        toast.error(serverMessage || "Error accessing profile.");
+        console.error("API Error:", error);
+      }
       console.error("API Error:", error);
     } finally {
       setActiveProfileId(null); // reset loading
@@ -436,6 +458,10 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
           </div>
         )}
       </div>
+      <PlatinumModal
+        isOpen={isPlatinumModalOpen}
+        onClose={() => setIsPlatinumModalOpen(false)}
+      />
     </div>
   );
 };

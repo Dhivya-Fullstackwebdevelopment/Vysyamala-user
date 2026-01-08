@@ -19,6 +19,7 @@ import "react-toastify/dist/ReactToastify.css"; // Import the CSS for react-toas
 import apiClient from "../../../API";
 import { Hearts } from "react-loader-spinner";
 import { encryptId } from "../../../utils/cryptoUtils";
+import PlatinumModal from "../ReUsePopup/PlatinumModalPopup";
 //import PlatinumModal from "../ReUsePopup/PlatinumModalPopup";
 // Define types for API response
 interface Profile {
@@ -66,6 +67,7 @@ export const ViewedProfilesCard: React.FC<ViewedProfilesCardProps> = ({ pageNumb
   const [activeProfileId, setActiveProfileId] = useState<string | null>(null);
   const location = useLocation();
   const [loading, setLoading] = useState<boolean>(true); // 👈 add local loading
+  const [isPlatinumModalOpen, setIsPlatinumModalOpen] = useState(false);
   //const [showPlatinumModal, setShowPlatinumModal] = useState(false);
 
   useEffect(() => {
@@ -170,6 +172,7 @@ export const ViewedProfilesCard: React.FC<ViewedProfilesCardProps> = ({ pageNumb
 
 
   const handleProfileClick = async (profileId: string) => {
+    if (isPlatinumModalOpen) return;
     if (activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
     const secureId = encryptId(profileId);
@@ -191,12 +194,20 @@ export const ViewedProfilesCard: React.FC<ViewedProfilesCardProps> = ({ pageNumb
         }
       );
 
+      // if (checkResponse.data.status === "failure") {
+      //   toast.error(checkResponse.data.message || "Limit reached to view profile");
+      //   setActiveProfileId(null);
+      //   return;
+      // }
+
       if (checkResponse.data.status === "failure") {
-        toast.error(checkResponse.data.message || "Limit reached to view profile");
-        setActiveProfileId(null);
+        if (checkResponse.data.message === "Profile visibility restricted") {
+          setIsPlatinumModalOpen(true);
+        } else {
+          toast.error(checkResponse.data.message || "Limit reached to view profile");
+        }
         return;
       }
-
       // Navigate after validation
       //navigate(`/ProfileDetails?id=${profileId}&rasi=1`);
       // navigate(`/ProfileDetails?id=${profileId}&page=4&from=viewedProfiles`);
@@ -208,8 +219,18 @@ export const ViewedProfilesCard: React.FC<ViewedProfilesCardProps> = ({ pageNumb
         }
       });
       // navigate(`/ProfileDetails?id=${profileId}&page=4`);
-    } catch (error) {
-      toast.error("Error accessing profile.");
+    } catch (error: any) {
+      // toast.error("Error accessing profile.");
+      // console.error("API Error:", error);
+      const serverMessage = error.response?.data?.message;
+
+      if (serverMessage === "Profile visibility restricted") {
+        setIsPlatinumModalOpen(true);
+      } else {
+        // Only show the toast if it's NOT the visibility restriction
+        toast.error(serverMessage || "Error accessing profile.");
+        console.error("API Error:", error);
+      }
       console.error("API Error:", error);
     } finally {
       setActiveProfileId(null); // reset loading
@@ -389,6 +410,10 @@ export const ViewedProfilesCard: React.FC<ViewedProfilesCardProps> = ({ pageNumb
           </div>
         </div>
       ))}
+      <PlatinumModal
+        isOpen={isPlatinumModalOpen}
+        onClose={() => setIsPlatinumModalOpen(false)}
+      />
     </div>
   );
 };

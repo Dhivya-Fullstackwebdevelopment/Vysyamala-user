@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { Hearts } from "react-loader-spinner";
 import { encryptId } from "../../../../utils/cryptoUtils";
+import PlatinumModal from "../../../DashBoard/ReUsePopup/PlatinumModalPopup";
 // import { toast } from "react-toastify";
 // import { ToastNotification } from "../../../Toast/ToastNotification";
 
@@ -42,6 +43,7 @@ export const GridListCard: React.FC<GridListCardProps> = ({ profile }) => {
     removeBookmark: () => { },
     setSelectedProfiles: () => { },
   };
+  const [isPlatinumModalOpen, setIsPlatinumModalOpen] = useState(false);
   const navigate = useNavigate();
   const loginuser_profileId = localStorage.getItem("loginuser_profile_id")
 
@@ -104,6 +106,7 @@ export const GridListCard: React.FC<GridListCardProps> = ({ profile }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCardClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (isPlatinumModalOpen) return;
     if (isLoading) return;
     setIsLoading(true);
     e.stopPropagation();
@@ -121,10 +124,20 @@ export const GridListCard: React.FC<GridListCardProps> = ({ profile }) => {
       );
 
       // Check for failure response
+      // if (checkResponse.data.status === "failure") {
+      //   toast.error(checkResponse.data.message || "Limit reached to view profile");
+      //   return;
+      // }
+
       if (checkResponse.data.status === "failure") {
-        toast.error(checkResponse.data.message || "Limit reached to view profile");
+        if (checkResponse.data.message === "Profile visibility restricted") {
+          setIsPlatinumModalOpen(true);
+        } else {
+          toast.error(checkResponse.data.message || "Limit reached to view profile");
+        }
         return;
       }
+
       // Get current page number from URL
       const secureId = encryptId(profile.profile_id);
       const searchParams = new URLSearchParams(window.location.search);
@@ -151,8 +164,16 @@ export const GridListCard: React.FC<GridListCardProps> = ({ profile }) => {
           sortOrder: currentSortOrder
         }
       });
-    } catch (error) {
-      toast.error("Error accessing profile.");
+    } catch (error: any) {
+      const serverMessage = error.response?.data?.message;
+
+      if (serverMessage === "Profile visibility restricted") {
+        setIsPlatinumModalOpen(true);
+      } else {
+        // Only show the toast if it's NOT the visibility restriction
+        toast.error(serverMessage || "Error accessing profile.");
+        console.error("API Error:", error);
+      }
       console.error("API Error:", error);
     } finally {
       setIsLoading(false);
@@ -191,7 +212,6 @@ export const GridListCard: React.FC<GridListCardProps> = ({ profile }) => {
           <p className="text-sm mt-2 text-primary">Please wait...</p>
         </div>
       )}
-
 
       <div className="flex justify-between gap-x-4 max-sm:flex-col max-sm:w-full max-sm:gap-2">
         {/* {/ Profile Image /} */}
@@ -325,6 +345,10 @@ export const GridListCard: React.FC<GridListCardProps> = ({ profile }) => {
             </p>
           </div>
         </div>
+        <PlatinumModal
+          isOpen={isPlatinumModalOpen}
+          onClose={() => setIsPlatinumModalOpen(false)}
+        />
       </div>
       {/* <ToastNotification/> */}
     </div>
