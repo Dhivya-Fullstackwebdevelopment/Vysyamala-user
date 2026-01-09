@@ -22,6 +22,7 @@ import { Hearts } from "react-loader-spinner";
 import { encryptId } from "../../utils/cryptoUtils";
 import PlatinumModal from "../DashBoard/ReUsePopup/PlatinumModalPopup";
 
+
 // Define the shape of your wishlist profile
 interface WishlistProfile {
   height: string;

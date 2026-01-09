@@ -3,6 +3,7 @@ import { IoClose } from "react-icons/io5";
 import { FaPhoneAlt } from "react-icons/fa";
 import { MdOutlineSecurity } from "react-icons/md";
 
+
 interface PlatinumModalProps {
     isOpen: boolean;
     onClose: () => void;
