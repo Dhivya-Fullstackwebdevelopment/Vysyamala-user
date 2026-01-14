@@ -37,6 +37,8 @@ export const PhotoSettings = () => {
   const [videoUrl, setVideoUrl] = useState("");
   const [uploadingImages,] = useState<string[]>([]);
   const maritalStatus = localStorage.getItem("maritalStatus");
+  const [allowVisit, setAllowVisit] = useState<number | null>(null);
+  const storedPlanId = localStorage.getItem("plan_id") || sessionStorage.getItem("plan_id");
 
   const {
     register,
@@ -61,6 +63,11 @@ export const PhotoSettings = () => {
     setShowPassword((prev) => !prev);
   };
 
+  const handleVisibilityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // --- Parse string input back to integer ---
+    setAllowVisit(Number(e.target.value));
+  };
+
   const onSubmit = async () => {
     if (!loginuser_profile_id) {
       alert("User not logged in.");
@@ -83,6 +90,16 @@ export const PhotoSettings = () => {
     formData.append("Video_url", videoUrl); // Replace with actual static value
     //  const filePreview = URL.createObjectURL(file);
     //   setUploadingImages((prev) => [...prev, filePreview]);
+    // if (allowVisit !== null) {
+    //   formData.append("allow_visit", allowVisit.toString());
+    // } else {
+    //   formData.append("allow_visit", "1"); // Default fallback if still null
+    // }
+    // ✅ Send allow_visit only for plan_id 16
+    if (storedPlanId === "16" && allowVisit !== null) {
+      formData.append("allow_visit", allowVisit.toString()); // "0" or "1"
+    }
+
 
     try {
       const response = await fetch(
@@ -121,6 +138,7 @@ export const PhotoSettings = () => {
     setIsChecked(false);
     setVideoUrl('');
     setValue("password", "");
+    setAllowVisit(null);
     // Reset other states if necessary
   };
 
@@ -202,6 +220,12 @@ export const PhotoSettings = () => {
           setValue("password", data.Photo_password); // Set the password value
         } else {
           setValue("password", ""); // Clear password if protection is off
+        }
+
+        if (data.allow_visit !== undefined && data.allow_visit !== null) {
+          setAllowVisit(data.allow_visit); // Stores 0 or 1 directly
+        } else {
+          setAllowVisit(null);
         }
       }
     } catch (error) {
@@ -364,6 +388,47 @@ export const PhotoSettings = () => {
           Vysyamala's admin WhatsApp No.9043085524
         </p>
       </div>
+
+      {storedPlanId === "16" && (
+        <div className="mt-6 mb-4">
+          <h1 className="font-semibold text-primary text-xl mb-4">
+            Delight Visibility Setting
+          </h1>
+          <div className="flex gap-6 items-center">
+            <div className="flex items-center">
+              <input
+                type="radio"
+                id="allowVisitYes"
+                name="allowVisit"
+                value="1"
+                // Checked if state is strictly 1
+                checked={allowVisit === 1}
+                onChange={handleVisibilityChange}
+                className="w-4 h-4 text-primary bg-gray-100 border-gray-300"
+              />
+              <label htmlFor="allowVisitYes" className="ml-2 text-base text-gray-900">
+                Yes
+              </label>
+            </div>
+            <div className="flex items-center">
+              <input
+                type="radio"
+                id="allowVisitNo"
+                name="allowVisit"
+                value="0"
+                // Checked if state is strictly 0
+                checked={allowVisit === 0}
+                onChange={handleVisibilityChange}
+                className="w-4 h-4 text-primary bg-gray-100 border-gray-300"
+              />
+              <label htmlFor="allowVisitNo" className="ml-2 text-base text-gray-900">
+                No
+              </label>
+            </div>
+          </div>
+        </div>
+      )}
+
       <button
         //   onClick={onSubmit}
         onClick={() => {
