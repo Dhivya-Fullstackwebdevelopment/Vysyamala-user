@@ -113,7 +113,10 @@ export const ProfileDetailsExpressInterest: React.FC<
   const idparam = decryptId(encryptedId);
   const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
   const custom_message = localStorage.getItem("custom_message");
-  const storedPlanId = sessionStorage.getItem("plan_id");
+  const storedPlanId = localStorage.getItem("plan_id") || sessionStorage.getItem("plan_id");
+  const isPlan16 = storedPlanId === "16";
+
+
   ////console.log("vysya", storedPlanId);
   const navigate = useNavigate();
 
@@ -1010,7 +1013,7 @@ export const ProfileDetailsExpressInterest: React.FC<
                         />
                       )}
                     </div>
-                    {profileData?.photo_request !== 0 && (
+                    {profileData?.photo_request !== 0 && !isPlan16 && (
                       <div>
                         <TbPhotoHeart
                           onClick={() => sendPhotoRequest()}
@@ -1019,19 +1022,21 @@ export const ProfileDetailsExpressInterest: React.FC<
                         />
                       </div>
                     )}
-                    <div>
-                      <img
-                        src={SupportAgent}
-                        onClick={handleVysassistpopup}
-                        title="Vys Assist"
-                        className="text-[22px] text-vysyamalaBlack cursor-pointer"
-                      />
-                      {showVysassist && (
-                        <VysAssistPopup
-                          profileData={vysAssistData}
-                          closePopup={closeVysassistpopup} />
-                      )}
-                    </div>
+                    {!isPlan16 && (
+                      <div>
+                        <img
+                          src={SupportAgent}
+                          onClick={handleVysassistpopup}
+                          title="Vys Assist"
+                          className="text-[22px] text-vysyamalaBlack cursor-pointer"
+                        />
+                        {showVysassist && (
+                          <VysAssistPopup
+                            profileData={vysAssistData}
+                            closePopup={closeVysassistpopup} />
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -1203,34 +1208,37 @@ export const ProfileDetailsExpressInterest: React.FC<
                   <div>
                     {/* Buttons */}
                     {interestParam !== "1" && status !== 2 && status !== 3 && loginuser_profileId && (
-                      <div className="flex justify-start gap-4 items-end">
-                        <button
-                          // onClick={
-                          //   custom_message && !isHeartMarked
-                          //     ? openMsgPopUp
-                          //     : handleHeartMark
-                          // }
-                          onClick={() => {
-                            if (custom_message && !isHeartMarked) {
-                              openMsgPopUp();
-                            } else {
-                              handleHeartMark();
-                            }
-                          }}
-                          className="bg-gradient text-white flex items-center rounded-md px-5 py-3 cursor-pointer"
-                        >
-                          <FaHeart
-                            className={`text-[22px] mr-2 ${isHeartMarked ? "text-red-500" : "text-gray-400"
-                              }`}
-                          />
-                          {
-                            isHeartMarked
-                              ? "Remove from Interest"
-                              : "Express Interest"
-                          }
 
-                          {/* Toast Notifications */}
-                        </button>
+                      <div className="flex justify-start gap-4 items-end">
+                        {!isPlan16 && (
+                          <button
+                            // onClick={
+                            //   custom_message && !isHeartMarked
+                            //     ? openMsgPopUp
+                            //     : handleHeartMark
+                            // }
+                            onClick={() => {
+                              if (custom_message && !isHeartMarked) {
+                                openMsgPopUp();
+                              } else {
+                                handleHeartMark();
+                              }
+                            }}
+                            className="bg-gradient text-white flex items-center rounded-md px-5 py-3 cursor-pointer"
+                          >
+                            <FaHeart
+                              className={`text-[22px] mr-2 ${isHeartMarked ? "text-red-500" : "text-gray-400"
+                                }`}
+                            />
+                            {
+                              isHeartMarked
+                                ? "Remove from Interest"
+                                : "Express Interest"
+                            }
+
+                            {/* Toast Notifications */}
+                          </button>
+                        )}
                         {profileData?.basic_details.horoscope_available === 1 && (
                           <a
 
