@@ -75,6 +75,8 @@ export const LoginHeader: React.FC = () => {
   console.log("validDate", validDate)
   const allowedPremiumIds = [1, 2, 3, 14, 15, 17, 10, 11, 12, 13];
   let buttonType: "addon" | "renew" | "upgrade" = "upgrade";
+  const storedPlanId = localStorage.getItem("plan_id") || sessionStorage.getItem("plan_id");
+  const isPlan16 = storedPlanId === "16";
 
   if (allowedPremiumIds.includes(PlanID) && validDate) {
     if (validDate.getTime() > currentDate.getTime()) {
@@ -83,7 +85,6 @@ export const LoginHeader: React.FC = () => {
       buttonType = "renew"; // validity expired
     }
   }
-
 
   const defaultImgUrl =
     gender?.toLowerCase() === "male"
@@ -668,27 +669,32 @@ export const LoginHeader: React.FC = () => {
                 )}
               </li>
 
-              {buttonType === "addon" && (
-                <Link to={"/PayNow"}>
-                  <li className="bg-gradient rounded-[6px] py-[6px] px-[24px] text-white text-sm font-semibold cursor-pointer max-lg:text-[14px]">
-                    Add-On-Packages
-                  </li>
-                </Link>
+              {!isPlan16 && (
+                <>
+                  {buttonType === "addon" && (
+                    <Link to={"/PayNow"}>
+                      <li className="bg-gradient rounded-[6px] py-[6px] px-[24px] text-white text-sm font-semibold cursor-pointer max-lg:text-[14px]">
+                        Add-On-Packages
+                      </li>
+                    </Link>
+                  )}
+                  {buttonType === "renew" && (
+                    <Link to={"/UpgradePlan"}>
+                      <li className="bg-gradient rounded-[6px] py-[6px] px-[24px] text-white text-sm font-semibold cursor-pointer max-lg:text-[14px]">
+                        Renew
+                      </li>
+                    </Link>
+                  )}
+                  {buttonType === "upgrade" && (
+                    <Link to={"/UpgradePlan"}>
+                      <li className="bg-gradient rounded-[6px] py-[6px] px-[24px] text-white text-sm font-semibold cursor-pointer max-lg:text-[14px]">
+                        Upgrade
+                      </li>
+                    </Link>
+                  )}
+                </>
               )}
-              {buttonType === "renew" && (
-                <Link to={"/UpgradePlan"}>
-                  <li className="bg-gradient rounded-[6px] py-[6px] px-[24px] text-white text-sm font-semibold cursor-pointer max-lg:text-[14px]">
-                    Renew
-                  </li>
-                </Link>
-              )}
-              {buttonType === "upgrade" && (
-                <Link to={"/UpgradePlan"}>
-                  <li className="bg-gradient rounded-[6px] py-[6px] px-[24px] text-white text-sm font-semibold cursor-pointer max-lg:text-[14px]">
-                    Upgrade
-                  </li>
-                </Link>
-              )}
+
             </ul>
 
             {/* Profile Image on hover */}
