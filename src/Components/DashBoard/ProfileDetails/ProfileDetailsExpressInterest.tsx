@@ -32,6 +32,7 @@ import { decryptId } from "../../../utils/cryptoUtils";
 interface HoroscopeDetails {
   star_name: string;
   surya_gothram: string;
+  padham?: string | number | null;
 }
 
 interface EducationDetails {
@@ -1090,27 +1091,46 @@ export const ProfileDetailsExpressInterest: React.FC<
                       </h5>
                     )}
 
+                    
                     {/* Star & Gothram */}
-                    <div className="flex justify-start gap-4 items-center mb-3  max-lg:flex-wrap max-sm:gap-3 max-sm:flex-col max-sm:items-start">
-                      {profileData?.horoscope_details?.star_name && profileData.horoscope_details.star_name !== "" && profileData.horoscope_details.star_name !== null && (
-                        <h5 className="text-[18px] text-ash font-semibold max-sm:text-[16px] mb-3">
-                          Star :
-                          <span className="font-normal">
-                            {" "}
-                            {profileData?.horoscope_details.star_name}
-                          </span>
-                        </h5>
-                      )}
+                    <div className="flex justify-start gap-4 items-center mb-3 max-lg:flex-wrap max-sm:gap-3 max-sm:flex-col max-sm:items-start">
+                      {profileData?.horoscope_details?.star_name &&
+                        profileData.horoscope_details.star_name !== "" &&
+                        profileData.horoscope_details.star_name !== null && (
+                          <>
+                            {(() => {
+                              const padham = profileData?.horoscope_details?.padham;
+                              const showPadham = padham &&
+                                padham !== "" &&
+                                padham !== null &&
+                                padham !== "0" &&
+                                padham !== 0;
 
-                      {profileData?.horoscope_details?.surya_gothram && profileData.horoscope_details.surya_gothram !== "" && profileData.horoscope_details.surya_gothram !== null && (
-                        <h5 className="text-[18px] text-ash font-semibold max-sm:text-[16px] mb-3">
-                          Gothram :
-                          <span className="font-normal">
-                            {" "}
-                            {profileData?.horoscope_details.surya_gothram}
-                          </span>
-                        </h5>
-                      )}
+                              return (
+                                <h5 className="text-[18px] text-ash font-semibold max-sm:text-[16px] mb-3">
+                                  Star :
+                                  <span className="font-normal">
+                                    {" "}
+                                    {profileData.horoscope_details.star_name}
+                                    {showPadham && ` - ${padham}`}
+                                  </span>
+                                </h5>
+                              );
+                            })()}
+                          </>
+                        )}
+
+                      {profileData?.horoscope_details?.surya_gothram &&
+                        profileData.horoscope_details.surya_gothram !== "" &&
+                        profileData.horoscope_details.surya_gothram !== null && (
+                          <h5 className="text-[18px] text-ash font-semibold max-sm:text-[16px] mb-3">
+                            Gothram :
+                            <span className="font-normal">
+                              {" "}
+                              {profileData?.horoscope_details.surya_gothram}
+                            </span>
+                          </h5>
+                        )}
                     </div>
 
                     {profileData?.education_details.profession && profileData.education_details.profession !== "" && profileData.education_details.profession !== null && (

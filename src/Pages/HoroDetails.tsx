@@ -22,6 +22,7 @@ const schema = zod.object({
   placeOfBirth: zod.string().min(3, "Place of birth is required"),
   birthStar: zod.string().min(1, "Birth star is required"),
   rasi: zod.string().min(1, "Rasi is required"),
+  padham: zod.string().nullable().optional(),
 });
 
 interface HoroDetailsInputs {
@@ -43,6 +44,7 @@ interface HoroDetailsInputs {
   period: "AM" | "PM" | "";
   hour: string;
   minute: string;
+  padham: string | null;
 }
 
 interface HoroDetailsProps { }
@@ -64,7 +66,8 @@ interface Lagnam {
 
 const HoroDetails: React.FC<HoroDetailsProps> = () => {
   const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false); // New state for submission status
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [padham, setPadham] = useState<string | null>(null);
 
   const {
     register,
@@ -124,6 +127,8 @@ const HoroDetails: React.FC<HoroDetailsProps> = () => {
           setValue("naalikai", profileData.nalikai);
           setValue("dasaName", profileData.dasa_name);
           setValue("horoscopeHints", profileData.horoscope_hints);
+          setValue("padham", profileData.padham);
+          setPadham(profileData.padham || null);
           setChevvaiDhosam(profileData.chevvai_dosaham);
           setSarpaDhosham(profileData.ragu_dosham);
           setSelectedDasa(profileData.dasa_name);
@@ -305,6 +310,7 @@ const HoroDetails: React.FC<HoroDetailsProps> = () => {
         horoscope_hints: horoHint,
         rasi_kattam: storedData,
         amsa_kattam: storedData1,
+        padham: padham,
       };
       sessionStorage.setItem('birth_rasi_name', rasiId);
       setIsSubmitting(true);
@@ -446,7 +452,7 @@ const HoroDetails: React.FC<HoroDetailsProps> = () => {
     if (dasaMonth) {
       parts.push(`${dasaMonth} Months`);
     }
-    if (dasaDay ) {
+    if (dasaDay) {
       parts.push(`${dasaDay} Days`);
     }
 
@@ -648,6 +654,35 @@ const HoroDetails: React.FC<HoroDetailsProps> = () => {
                 {errors.birthStar && (
                   <span className="text-red-500">{errors.birthStar.message}</span>
                 )}
+              </div>
+
+              <div>
+                <label htmlFor="padham" className="block mb-1 text-primary font-medium">
+                  Padham
+                </label>
+                <div className="relative">
+                  <select
+                    id="padham"
+                    value={padham || ""}
+                    className="outline-none w-full text-placeHolderColor px-3 py-[13px] text-sm border border-ashBorder rounded appearance-none"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const padhamValue = value === "" ? null : value;
+                      setPadham(padhamValue);
+                      setValue("padham", padhamValue);
+                    }}
+                  >
+                    <option value="">Select Padham</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                  </select>
+                  <IoMdArrowDropdown
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"
+                    size={20}
+                  />
+                </div>
               </div>
 
               <div>

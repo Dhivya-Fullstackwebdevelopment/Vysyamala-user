@@ -27,6 +27,7 @@ interface HoroscopeDetails {
   personal_amsa_katt: string;
   personal_horoscope_hints: string;
   personal_madulamn: string;
+  personal_padham?: string | number | null;
 }
 
 // Define the interface for Lagnam data
@@ -196,6 +197,17 @@ export const Horoscope = () => {
 
     fetchHoroscopeDetails();
   }, [loginuser_profileId, lagnams, refreshData]);
+
+  useEffect(() => {
+    console.log("Padham value debug:", {
+      formData_padham: formData.personal_padham,
+      type: typeof formData.personal_padham,
+      isNull: formData.personal_padham === null,
+      isUndefined: formData.personal_padham === undefined,
+      isString: typeof formData.personal_padham === 'string',
+      isEmptyString: formData.personal_padham === ''
+    });
+  }, [formData.personal_padham]);
 
   // Add these useEffects to handle dasa balance formatting
   useEffect(() => {
@@ -430,6 +442,7 @@ export const Horoscope = () => {
           ...horoscopeDetails,
           personal_bthstar_id: horoscopeDetails.personal_bthstar_id,
           personal_bth_rasi_id: horoscopeDetails.personal_bth_rasi_id,
+          personal_padham: horoscopeDetails.personal_padham === null ? "" : horoscopeDetails.personal_padham,
         });
 
         setSelectedBirthStarId(horoscopeDetails.personal_bthstar_id?.toString() || "");
@@ -566,6 +579,7 @@ export const Horoscope = () => {
           rasi_kattam: formData.personal_rasi_katt,
           amsa_kattam: formData.personal_amsa_katt,
           horoscope_hints: formData.personal_horoscope_hints, // Add this line
+          padham: formData.personal_padham,
         }
       );
 
@@ -652,6 +666,7 @@ export const Horoscope = () => {
                   </p>
                 )}
               </label>
+
               <label className="block mb-2 text-[20px] text-ash font-semibold max-xl:text-[18px] max-lg:text-[16px] max-lg:font-medium">
                 Rasi Name:
                 <select
@@ -816,6 +831,25 @@ export const Horoscope = () => {
             </div>
             <div>
               <label className="block mb-2 text-[20px] text-ash font-semibold max-xl:text-[18px] max-lg:text-[16px] max-lg:font-medium">
+                Padham:
+                <select
+                  name="personal_padham"
+                  value={formData.personal_padham === null || formData.personal_padham === undefined ? "" : String(formData.personal_padham)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const finalValue = value === "" ? null : Number(value);
+                    setFormData(prev => ({ ...prev, personal_padham: finalValue }));
+                  }}
+                  className="font-normal border rounded px-3 py-[10px] w-full focus:outline-none border-ashBorder"
+                >
+                  <option value="">Select Padham</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                </select>
+              </label>
+              <label className="block mb-2 text-[20px] text-ash font-semibold max-xl:text-[18px] max-lg:text-[16px] max-lg:font-medium">
                 Didi
                 <input
                   type="text"
@@ -964,6 +998,12 @@ export const Horoscope = () => {
                 <span className="font-normal">
                   {" "}
                   {horoscopeDetails.personal_bthstar_name || "N/A"}
+                  {horoscopeDetails?.personal_padham &&
+                    horoscopeDetails.personal_padham !== "" &&
+                    horoscopeDetails.personal_padham !== null &&
+                    horoscopeDetails.personal_padham !== "0" &&
+                    horoscopeDetails.personal_padham !== 0 &&
+                    ` - ${horoscopeDetails.personal_padham}`}
                 </span>
               </h5>
               <h5 className="text-[20px] text-ash font-semibold mb-4 max-lg:text-[16px]">

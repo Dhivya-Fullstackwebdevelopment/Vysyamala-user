@@ -44,6 +44,7 @@ interface GetProfileDetMatch {
   anual_income?: string;
   company_name?: string;
   place_of_stay?: string;
+  padham?: string | number | null;
 }
 
 interface EmptyField {
@@ -785,12 +786,18 @@ export const MyProfile = () => {
                         </div>
                       )}
 
-                      <div className="flex justify-start gap-x-10 gap-y-3 items-center mb-3 max-lg:flex-wrap max-sm:gap-3  max-sm:flex-col max-sm:items-start">
+                      <div className="flex justify-start gap-x-10 gap-y-3 items-center mb-3 max-lg:flex-wrap max-sm:gap-3 max-sm:flex-col max-sm:items-start">
                         <h5 className="text-[18px] text-ash font-semibold max-sm:text-[16px]">
                           Star :
                           <span className="font-normal">
                             {" "}
                             {get_myprofile_personal.star}
+                            {get_myprofile_personal?.padham &&
+                              get_myprofile_personal.padham !== "" &&
+                              get_myprofile_personal.padham !== null &&
+                              get_myprofile_personal.padham !== "0" &&
+                              get_myprofile_personal.padham !== 0 &&
+                              ` - ${get_myprofile_personal.padham}`}
                           </span>
                         </h5>
 

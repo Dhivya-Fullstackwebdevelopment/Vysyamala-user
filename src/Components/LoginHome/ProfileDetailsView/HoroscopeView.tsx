@@ -107,9 +107,20 @@ export const HoroscopeView: React.FC = () => {
                         <h5 className="text-[20px] text-ash font-semibold mb-4 max-lg:text-[16px]">Rasi:
                             <span className="font-normal"> {horoscope_details?.rasi}</span></h5>)}
 
-                    {horoscope_details?.star_name && horoscope_details.star_name !== "" && horoscope_details.star_name !== null && (
-                        <h5 className="text-[20px] text-ash font-semibold mb-4 max-lg:text-[16px]">Star Name:
-                            <span className="font-normal"> {horoscope_details?.star_name}</span></h5>)}
+                    {horoscope_details?.star_name && horoscope_details.star_name !== "" && horoscope_details.star_name !== null && (() => {
+                        const padham = horoscope_details?.padham;
+
+                        return (
+                            <h5 className="text-[20px] text-ash font-semibold mb-4 max-lg:text-[16px]">
+                                Star Name:
+                                <span className="font-normal">
+                                    {" "}
+                                    {horoscope_details.star_name}
+                                    {padham && padham !== "" && padham !== null && padham !== "0" && padham !== 0 && ` - ${padham}`}
+                                </span>
+                            </h5>
+                        );
+                    })()}
 
                     {horoscope_details?.lagnam && horoscope_details.lagnam !== "" && horoscope_details.lagnam !== null && (
                         <h5 className="text-[20px] text-ash font-semibold mb-4 max-lg:text-[16px]">Lagnam:
