@@ -14,6 +14,8 @@ import {
   NotifySuccess,
 } from "../../Toast/ToastNotification";
 import { RotatingSquare } from "react-loader-spinner";
+import { decryptId } from "../../../utils/cryptoUtils";
+import { useSearchParams } from "react-router-dom";
 
 interface UserImages {
   [key: string]: string;
@@ -203,8 +205,12 @@ export const ProfileSlickView: React.FC<ProfileSlickViewProps> = ({
   const sliderRef2 = useRef<Slider | null>(null);
   const [zoomImage, setZoomImage] = useState<string | null>(null);
 
-  const queryParams = new URLSearchParams(location.search);
-  const id = queryParams.get("id");
+  // const queryParams = new URLSearchParams(location.search);
+  // const id = queryParams.get("id");
+  // Decrypt the ID from search params
+  const [searchParams] = useSearchParams();
+  const encryptedId = searchParams.get("id") || "";
+  const id = decryptId(encryptedId);
 
   const storedProtectedImg = sessionStorage.getItem(`userImages_${id}`);
   const sessionImage: UserImages = storedProtectedImg
@@ -326,7 +332,7 @@ export const ProfileSlickView: React.FC<ProfileSlickViewProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [profileId,defaultImgUrl]);
+  }, [profileId, defaultImgUrl]);
 
   useEffect(() => {
     const storedLockVal = sessionStorage.getItem("photolock");
