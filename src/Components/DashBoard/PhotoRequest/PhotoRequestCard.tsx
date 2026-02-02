@@ -35,6 +35,7 @@ import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { Hearts } from "react-loader-spinner";
 import { encryptId } from "../../../utils/cryptoUtils";
+import PlatinumModal from "../ReUsePopup/PlatinumModalPopup";
 
 
 interface PhotoRequestData {
@@ -108,6 +109,7 @@ const PhotoRequestCard = ({
     const savedBookmarks = sessionStorage.getItem("bookmarkedProfiles");
     return savedBookmarks ? JSON.parse(savedBookmarks) : [];
   });
+  const [isPlatinumModalOpen, setIsPlatinumModalOpen] = useState(false);
 
   const handleMessage = async (fromProfileId: string) => {
     try {
@@ -366,15 +368,35 @@ const PhotoRequestCard = ({
         }
       );
 
+      // if (checkResponse.data.status === "failure") {
+      //   toast.error(checkResponse.data.message || "Limit reached to view profile");
+      //   setActiveProfileId(null);
+      //   return;
+      // }
+
+
       if (checkResponse.data.status === "failure") {
-        toast.error(checkResponse.data.message || "Limit reached to view profile");
-        setActiveProfileId(null);
+        if (checkResponse.data.message === "Profile visibility restricted") {
+          setIsPlatinumModalOpen(true);
+        } else {
+          toast.error(checkResponse.data.message || "Limit reached to view profile");
+        }
         return;
       }
       // Navigate after validation
       navigate(`/ProfileDetails?id=${secureId}&page=6&sortBy=${sortBy}`);
-    } catch (error) {
-      toast.error("Error accessing profile.");
+    } catch (error: any) {
+      // toast.error("Error accessing profile.");
+      // console.error("API Error:", error);
+      const serverMessage = error.response?.data?.message;
+
+      if (serverMessage === "Profile visibility restricted") {
+        setIsPlatinumModalOpen(true);
+      } else {
+        // Only show the toast if it's NOT the visibility restriction
+        toast.error(serverMessage || "Error accessing profile.");
+        console.error("API Error:", error);
+      }
       console.error("API Error:", error);
     } finally {
       setActiveProfileId(null); // reset loading
@@ -636,6 +658,10 @@ const PhotoRequestCard = ({
             onDeclineSubmit={handleDeclineSubmit}
           />
         )}
+        <PlatinumModal
+          isOpen={isPlatinumModalOpen}
+          onClose={() => setIsPlatinumModalOpen(false)}
+        />
       </div>
     </div>
   );

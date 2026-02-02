@@ -15,6 +15,7 @@ import "react-toastify/dist/ReactToastify.css"; // Import the CSS for react-toas
 import apiClient from "../../../API";
 import { Hearts } from "react-loader-spinner";
 import { encryptId } from "../../../utils/cryptoUtils";
+import PlatinumModal from "../ReUsePopup/PlatinumModalPopup";
 
 // Define the Profile interface
 export interface Profile {
@@ -61,6 +62,7 @@ export const InterestSentCard: React.FC<InterestSentCardProps> = ({ pageNumber, 
   const [userName] = useState("");
   const [activeProfileId, setActiveProfileId] = useState<string | null>(null);
   const location = useLocation();
+  const [isPlatinumModalOpen, setIsPlatinumModalOpen] = useState(false);
 
   // Added state to capture the selected from_profile_id for messaging
   // const [, setSelectedFromProfileId] = useState<string | null>(null);
@@ -270,6 +272,7 @@ export const InterestSentCard: React.FC<InterestSentCardProps> = ({ pageNumber, 
 
 
   const handleProfileClick = async (profileId: string) => {
+    if (isPlatinumModalOpen) return;
     if (activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
     const secureId = encryptId(profileId);
@@ -290,9 +293,18 @@ export const InterestSentCard: React.FC<InterestSentCardProps> = ({ pageNumber, 
         }
       );
 
+      // if (checkResponse.data.status === "failure") {
+      //   toast.error(checkResponse.data.message || "Limit reached to view profile");
+      //   setActiveProfileId(null);
+      //   return;
+      // }
+
       if (checkResponse.data.status === "failure") {
-        toast.error(checkResponse.data.message || "Limit reached to view profile");
-        setActiveProfileId(null);
+        if (checkResponse.data.message === "Profile visibility restricted") {
+          setIsPlatinumModalOpen(true);
+        } else {
+          toast.error(checkResponse.data.message || "Limit reached to view profile");
+        }
         return;
       }
 
@@ -310,8 +322,18 @@ export const InterestSentCard: React.FC<InterestSentCardProps> = ({ pageNumber, 
       //   profile_id: loginuser_profileId,
       //   viewed_profile: profileId,
       // });
-    } catch (error) {
-      toast.error("Error accessing profile.");
+    } catch (error: any) {
+      // toast.error("Error accessing profile.");
+      // console.error("API Error:", error);
+      const serverMessage = error.response?.data?.message;
+
+      if (serverMessage === "Profile visibility restricted") {
+        setIsPlatinumModalOpen(true);
+      } else {
+        // Only show the toast if it's NOT the visibility restriction
+        toast.error(serverMessage || "Error accessing profile.");
+        console.error("API Error:", error);
+      }
       console.error("API Error:", error);
     } finally {
       setActiveProfileId(null); // reset loading
@@ -521,6 +543,10 @@ export const InterestSentCard: React.FC<InterestSentCardProps> = ({ pageNumber, 
           </div>
         </div>
       ))}
+      <PlatinumModal
+        isOpen={isPlatinumModalOpen}
+        onClose={() => setIsPlatinumModalOpen(false)}
+      />
     </div>
   );
 };

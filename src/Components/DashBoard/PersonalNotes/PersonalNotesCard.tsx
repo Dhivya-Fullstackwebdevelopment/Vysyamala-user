@@ -12,6 +12,7 @@ import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { Hearts } from "react-loader-spinner";
 import { encryptId } from "../../../utils/cryptoUtils";
+import PlatinumModal from "../ReUsePopup/PlatinumModalPopup";
 
 interface GetProfListMatch {
   profile_id: string;
@@ -155,9 +156,12 @@ export const PersonalNotesCard: React.FC<PersonalNotesCardProps> = ({ pageNumber
 
   const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
+  const [isPlatinumModalOpen, setIsPlatinumModalOpen] = useState(false);
+
 
   const handleProfileClick = async (profileId: string) => {
     if (isLoading) return;
+    if (isPlatinumModalOpen) return;
     setIsLoading(true);
     const secureId = encryptId(profileId);
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
@@ -178,8 +182,18 @@ export const PersonalNotesCard: React.FC<PersonalNotesCardProps> = ({ pageNumber
       );
 
       // Check for failure response
+      // if (checkResponse.data.status === "failure") {
+      //   toast.error(checkResponse.data.message || "Limit reached to view profile");
+      //   return;
+      // }
+
+
       if (checkResponse.data.status === "failure") {
-        toast.error(checkResponse.data.message || "Limit reached to view profile");
+        if (checkResponse.data.message === "Profile visibility restricted") {
+          setIsPlatinumModalOpen(true);
+        } else {
+          toast.error(checkResponse.data.message || "Limit reached to view profile");
+        }
         return;
       }
 
@@ -200,168 +214,182 @@ export const PersonalNotesCard: React.FC<PersonalNotesCardProps> = ({ pageNumber
           viewed_profile: profileId,
         }
       );
-    } catch (error) {
-      toast.error("Error accessing profile.");
+    } catch (error: any) {
+      // toast.error("Error accessing profile.");
+      // console.error("API Error:", error);
+      const serverMessage = error.response?.data?.message;
+
+      if (serverMessage === "Profile visibility restricted") {
+        setIsPlatinumModalOpen(true);
+      } else {
+        // Only show the toast if it's NOT the visibility restriction
+        toast.error(serverMessage || "Error accessing profile.");
+        console.error("API Error:", error);
+      }
       console.error("API Error:", error);
     } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[200px]">
-        <Hearts height="80" width="80" color="#FF6666" visible={true} />
-        <p className="mt-2 text-sm text-primary">Loading profiles...</p>
-      </div>
-    );
+    setIsLoading(false);
   }
+};
 
+if (loading) {
   return (
-    <div>
-      <ToastContainer />
-      {profilesData.length > 0 ? (
-        profilesData.map((profileData) => (
-          <div key={profileData.profile_id} className="space-y-5 rounded-xl shadow-profileCardShadow p-5 mb-5">
-            <div className="flex justify-start items-start space-x-5 relative">
-              <div className="w-full flex justify-between items-center">
-                <div className="flex justify-between items-center space-x-5  max-sm:flex-col max-sm:gap-5 max-sm:w-full max-sm:items-start">
-                  {/* Profile Image */}
-                  <div className="relative  max-sm:w-full">
-                    <img src={profileData.profile_image || defaultImgUrl} alt="Profile"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null; // Prevent infinite loop
-                        e.currentTarget.src = defaultImgUrl; // Set default image
-                      }}
-                      className="rounded-[6px] w-[218px] h-[218px]  max-md:w-full" />
-                    {profileData.wish_list === 1 || profileData.wish_list === "1" ? (
-                      <MdBookmark
-                        onClick={() => handleBookmarkToggle(profileData.profile_id, profileData.wish_list)}
-                        className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
-                      />
-                    ) : (
-                      <MdBookmarkBorder
-                        onClick={() => handleBookmarkToggle(profileData.profile_id, profileData.wish_list)}
-                        className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
-                      />
-                    )}
+    <div className="flex flex-col items-center justify-center min-h-[200px]">
+      <Hearts height="80" width="80" color="#FF6666" visible={true} />
+      <p className="mt-2 text-sm text-primary">Loading profiles...</p>
+    </div>
+  );
+}
+
+return (
+  <div>
+    <ToastContainer />
+    {profilesData.length > 0 ? (
+      profilesData.map((profileData) => (
+        <div key={profileData.profile_id} className="space-y-5 rounded-xl shadow-profileCardShadow p-5 mb-5">
+          <div className="flex justify-start items-start space-x-5 relative">
+            <div className="w-full flex justify-between items-center">
+              <div className="flex justify-between items-center space-x-5  max-sm:flex-col max-sm:gap-5 max-sm:w-full max-sm:items-start">
+                {/* Profile Image */}
+                <div className="relative  max-sm:w-full">
+                  <img src={profileData.profile_image || defaultImgUrl} alt="Profile"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null; // Prevent infinite loop
+                      e.currentTarget.src = defaultImgUrl; // Set default image
+                    }}
+                    className="rounded-[6px] w-[218px] h-[218px]  max-md:w-full" />
+                  {profileData.wish_list === 1 || profileData.wish_list === "1" ? (
+                    <MdBookmark
+                      onClick={() => handleBookmarkToggle(profileData.profile_id, profileData.wish_list)}
+                      className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
+                    />
+                  ) : (
+                    <MdBookmarkBorder
+                      onClick={() => handleBookmarkToggle(profileData.profile_id, profileData.wish_list)}
+                      className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
+                    />
+                  )}
+                </div>
+
+                {/* Profile Details */}
+                <div className="">
+                  {/* Name & Profile ID */}
+                  <div className="relative mb-2">
+                    <h5 className="text-[20px] text-secondary font-semibold cursor-pointer"
+                      onClick={() => handleProfileClick(profileData.profile_id)}
+                    >
+                      {profileData.profile_name}
+                      <span className="text-sm text-ashSecondary ml-2">
+                        ({profileData.profile_id})
+                      </span>
+                      <MdVerifiedUser className="inline-block ml-2 text-checkGreen" />
+                    </h5>
                   </div>
 
-                  {/* Profile Details */}
-                  <div className="">
-                    {/* Name & Profile ID */}
-                    <div className="relative mb-2">
-                      <h5 className="text-[20px] text-secondary font-semibold cursor-pointer"
-                        onClick={() => handleProfileClick(profileData.profile_id)}
-                      >
-                        {profileData.profile_name}
-                        <span className="text-sm text-ashSecondary ml-2">
-                          ({profileData.profile_id})
-                        </span>
-                        <MdVerifiedUser className="inline-block ml-2 text-checkGreen" />
-                      </h5>
-                    </div>
+                  {/* Age & Height */}
+                  <div className="flex items-center space-x-3 mb-2">
+                    <p className="flex items-center text-sm text-primary font-normal">
+                      <IoCalendar className="mr-2 text-primary" />
+                      {profileData.age} yrs
+                    </p>
+                    <p className="text-gray font-semibold">|</p>
+                    <p className="flex items-center text-sm text-primary font-normal">
+                      <FaPersonArrowUpFromLine className="mr-2 text-primary" />
+                      {profileData.height} ft
+                    </p>
+                  </div>
 
-                    {/* Age & Height */}
-                    <div className="flex items-center space-x-3 mb-2">
-                      <p className="flex items-center text-sm text-primary font-normal">
-                        <IoCalendar className="mr-2 text-primary" />
-                        {profileData.age} yrs
-                      </p>
-                      <p className="text-gray font-semibold">|</p>
-                      <p className="flex items-center text-sm text-primary font-normal">
-                        <FaPersonArrowUpFromLine className="mr-2 text-primary" />
-                        {profileData.height} ft
-                      </p>
-                    </div>
+                  {/* Other Details */}
+                  <div className="mb-2">
+                    <p className="flex items-center text-sm text-primary font-normal">
+                      <MdStars className="mr-2 text-primary" />
+                      {profileData.star}
+                    </p>
+                  </div>
 
-                    {/* Other Details */}
-                    <div className="mb-2">
-                      <p className="flex items-center text-sm text-primary font-normal">
-                        <MdStars className="mr-2 text-primary" />
-                        {profileData.star}
-                      </p>
-                    </div>
+                  <div className="mb-2">
+                    <p className="flex items-center text-sm text-primary font-normal">
+                      <IoSchool className="mr-2 text-primary" />
+                      {profileData.degree}
+                    </p>
+                  </div>
 
-                    <div className="mb-2">
-                      <p className="flex items-center text-sm text-primary font-normal">
-                        <IoSchool className="mr-2 text-primary" />
-                        {profileData.degree}
-                      </p>
-                    </div>
+                  <div className="mb-2">
+                    <p className="flex items-center text-sm text-primary font-normal">
+                      <FaSuitcase className="mr-2 text-primary" />
+                      {profileData.profession}
+                    </p>
+                  </div>
 
-                    <div className="mb-2">
-                      <p className="flex items-center text-sm text-primary font-normal">
-                        <FaSuitcase className="mr-2 text-primary" />
-                        {profileData.profession}
-                      </p>
-                    </div>
+                  <div className="mb-2">
+                    <p className="flex items-center text-sm text-primary font-normal">
+                      <FaLocationDot className="mr-2 text-primary" />
+                      {profileData.location}
+                    </p>
+                  </div>
 
-                    <div className="mb-2">
-                      <p className="flex items-center text-sm text-primary font-normal">
-                        <FaLocationDot className="mr-2 text-primary" />
-                        {profileData.location}
+                  {/* Additional Info */}
+                  <div className="flex justify-start items-center gap-3 max-2xl:flex-wrap">
+                    <div>
+                      <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
+                        <MdOutlineGrid3X3 className="mr-2 text-primary" />   {profileData.notes_horoscope}
                       </p>
                     </div>
 
-                    {/* Additional Info */}
-                    <div className="flex justify-start items-center gap-3 max-2xl:flex-wrap">
-                      <div>
-                        <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
-                          <MdOutlineGrid3X3 className="mr-2 text-primary" />   {profileData.notes_horoscope}
-                        </p>
-                      </div>
+                    <div>
+                      <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
+                        <FaUser className="mr-2 text-primary" />  {profileData.notes_userstatus}
+                      </p>
+                    </div>
 
-                      <div>
-                        <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
-                          <FaUser className="mr-2 text-primary" />  {profileData.notes_userstatus}
-                        </p>
-                      </div>
+                    <div>
+                      <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
+                        <IoCalendar className="mr-2 text-primary" /> Last visit on {profileData.notes_lastvisit}
+                      </p>
+                    </div>
 
-                      <div>
-                        <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
-                          <IoCalendar className="mr-2 text-primary" /> Last visit on {profileData.notes_lastvisit}
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
-                          <IoEye className="mr-2 text-primary" />{profileData.notes_views} views
-                        </p>
-                      </div>
+                    <div>
+                      <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
+                        <IoEye className="mr-2 text-primary" />{profileData.notes_views} views
+                      </p>
                     </div>
                   </div>
                 </div>
-
-                {/* Matching Score */}
-                {profileData.notes_match_score !== undefined &&
-                  profileData.notes_match_score > 50 && profileData.notes_match_score !== 100 && (
-                    <div className="max-lg:hidden">
-                      <div>
-                        <MatchingScore scorePercentage={profileData.notes_match_score} />
-                      </div>
-                    </div>
-                  )}
               </div>
-            </div>
 
-            {/* Notes */}
-            <div className="bg-[#D9D9D966] rounded-xl p-5 space-y-1">
-              <h5 className="text-primary font-semibold">
-                {profileData.notes_details ?? "N/A"}
-              </h5>
-              <p className="text-sm text-primary">
-                Last updated on {profileData.notes_datetime
-                  ? profileData.notes_datetime.split('T')[0]
-                  : "N/A"}
-              </p>
-              {statusMessage && <p className="mt-2 text-sm">{statusMessage}</p>}
+              {/* Matching Score */}
+              {profileData.notes_match_score !== undefined &&
+                profileData.notes_match_score > 50 && profileData.notes_match_score !== 100 && (
+                  <div className="max-lg:hidden">
+                    <div>
+                      <MatchingScore scorePercentage={profileData.notes_match_score} />
+                    </div>
+                  </div>
+                )}
             </div>
           </div>
-        ))
-      ) : (
-        <p>No profile data...</p>
-      )}
-    </div>
-  );
+
+          {/* Notes */}
+          <div className="bg-[#D9D9D966] rounded-xl p-5 space-y-1">
+            <h5 className="text-primary font-semibold">
+              {profileData.notes_details ?? "N/A"}
+            </h5>
+            <p className="text-sm text-primary">
+              Last updated on {profileData.notes_datetime
+                ? profileData.notes_datetime.split('T')[0]
+                : "N/A"}
+            </p>
+            {statusMessage && <p className="mt-2 text-sm">{statusMessage}</p>}
+          </div>
+        </div>
+      ))
+    ) : (
+      <p>No profile data...</p>
+    )}
+    <PlatinumModal
+      isOpen={isPlatinumModalOpen}
+      onClose={() => setIsPlatinumModalOpen(false)}
+    />
+  </div>
+);
 };

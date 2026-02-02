@@ -1,7 +1,7 @@
 import { HeroSlider } from "./HeroSlider";
 import { MatchingProfiles } from "./MatchingProfiles";
-import { SuggestedProfiles } from "./SuggestedProfiles";
-import { FeaturedProfiles } from "./FeaturedProfiles";
+// import { SuggestedProfiles } from "./SuggestedProfiles";
+// import { FeaturedProfiles } from "./FeaturedProfiles";
 // import { VysyamalaStore } from './VysyamalaStore';
 // import { VysyaBazaar } from './VysyaBazaar';
 // import {OfferNotification} from "../../Components/OfferToast/OfferNotification";

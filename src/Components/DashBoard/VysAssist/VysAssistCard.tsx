@@ -20,6 +20,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 import { Hearts } from "react-loader-spinner";
 import { encryptId } from "../../../utils/cryptoUtils";
+import PlatinumModal from "../ReUsePopup/PlatinumModalPopup";
 
 // Define the interface for the profile data
 interface ProfileData {
@@ -79,6 +80,7 @@ export const VysAssistCard: React.FC<VysassistCardProps> = ({ pageNumber, sortBy
     const isBookmarked = (wishListStatus: number): boolean => {
         return wishListStatus === 1;
     };
+    const [isPlatinumModalOpen, setIsPlatinumModalOpen] = useState(false);
 
     // const handleBookmark = (profileId: string) => {
     //     setIsBookmarked(prevState => ({
@@ -171,6 +173,7 @@ export const VysAssistCard: React.FC<VysassistCardProps> = ({ pageNumber, sortBy
 
     const handleProfileClick = async (profileId: string) => {
         if (activeProfileId) return;
+        if (isPlatinumModalOpen) return;
         setActiveProfileId(profileId); // set the card that's loading
         const secureId = encryptId(profileId);
         const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
@@ -190,9 +193,18 @@ export const VysAssistCard: React.FC<VysassistCardProps> = ({ pageNumber, sortBy
                 }
             );
 
+            // if (checkResponse.data.status === "failure") {
+            //     toast.error(checkResponse.data.message || "Limit reached to view profile");
+            //     setActiveProfileId(null);
+            //     return;
+            // }
+
             if (checkResponse.data.status === "failure") {
-                toast.error(checkResponse.data.message || "Limit reached to view profile");
-                setActiveProfileId(null);
+                if (checkResponse.data.message === "Profile visibility restricted") {
+                    setIsPlatinumModalOpen(true);
+                } else {
+                    toast.error(checkResponse.data.message || "Limit reached to view profile");
+                }
                 return;
             }
             // Navigate after validation
@@ -203,8 +215,18 @@ export const VysAssistCard: React.FC<VysassistCardProps> = ({ pageNumber, sortBy
                     sortBy: sortBy
                 }
             });
-        } catch (error) {
-            toast.error("Error accessing profile.");
+        } catch (error: any) {
+            // toast.error("Error accessing profile.");
+            // console.error("API Error:", error);
+            const serverMessage = error.response?.data?.message;
+
+            if (serverMessage === "Profile visibility restricted") {
+                setIsPlatinumModalOpen(true);
+            } else {
+                // Only show the toast if it's NOT the visibility restriction
+                toast.error(serverMessage || "Error accessing profile.");
+                console.error("API Error:", error);
+            }
             console.error("API Error:", error);
         } finally {
             setActiveProfileId(null); // reset loading
@@ -369,8 +391,10 @@ export const VysAssistCard: React.FC<VysassistCardProps> = ({ pageNumber, sortBy
                     </div>
                 ))
             )}
-
-
+            <PlatinumModal
+                isOpen={isPlatinumModalOpen}
+                onClose={() => setIsPlatinumModalOpen(false)}
+            />
         </div>
     );
 };

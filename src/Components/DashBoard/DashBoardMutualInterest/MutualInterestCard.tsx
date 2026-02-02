@@ -12,6 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 import apiClient from "../../../API";
 import { Hearts } from "react-loader-spinner";
 import { encryptId } from "../../../utils/cryptoUtils";
+import PlatinumModal from "../ReUsePopup/PlatinumModalPopup";
 
 // Define the Profile interface
 export interface Profile {
@@ -207,8 +208,11 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const [activeProfileId, setActiveProfileId] = useState<string | null>(null);
+  const [isPlatinumModalOpen, setIsPlatinumModalOpen] = useState(false);
+
 
   const handleProfileClick = async (profileId: string, sortBy: string) => {
+    if (isPlatinumModalOpen) return;
     if (activeProfileId) return;
     setActiveProfileId(profileId);
     const secureId = encryptId(profileId);
@@ -229,9 +233,19 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         }
       );
 
+      // if (checkResponse.data.status === "failure") {
+      //   toast.error(checkResponse.data.message || "Limit reached to view profile");
+      //   setActiveProfileId(null);
+      //   return;
+      // }
+
+
       if (checkResponse.data.status === "failure") {
-        toast.error(checkResponse.data.message || "Limit reached to view profile");
-        setActiveProfileId(null);
+        if (checkResponse.data.message === "Profile visibility restricted") {
+          setIsPlatinumModalOpen(true);
+        } else {
+          toast.error(checkResponse.data.message || "Limit reached to view profile");
+        }
         return;
       }
 
@@ -246,8 +260,18 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
           sortBy: sortBy
         }
       });
-    } catch (error) {
-      toast.error("Error accessing profile.");
+    } catch (error: any) {
+      // toast.error("Error accessing profile.");
+      // console.error("API Error:", error);
+      const serverMessage = error.response?.data?.message;
+
+      if (serverMessage === "Profile visibility restricted") {
+        setIsPlatinumModalOpen(true);
+      } else {
+        // Only show the toast if it's NOT the visibility restriction
+        toast.error(serverMessage || "Error accessing profile.");
+        console.error("API Error:", error);
+      }
       console.error("API Error:", error);
     } finally {
       setActiveProfileId(null);
@@ -261,121 +285,127 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
       : "https://vysyamat.blob.core.windows.net/vysyamala/default_groom.png";
 
   return (
-    <div
-      className="flex justify-start items-center space-x-5 relative rounded-xl shadow-profileCardShadow p-5 mb-5"
-      onClick={() => handleProfileClick(profile.mutint_profileid, sortBy)}
-    >
-      {activeProfileId === profile.mutint_profileid && (
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white bg-opacity-70 rounded-xl">
-          <Hearts height="80" width="80" color="#FF6666" visible={true} />
-          <p className="mt-2 text-sm text-primary">Please wait...</p>
-        </div>
-      )}
-      <div className="w-full flex justify-between items-center">
-        <div className="flex justify-between items-center space-x-5 max-sm:flex-col max-sm:gap-5 max-sm:w-full max-sm:items-start">
-          <div className="relative max-sm:w-full">
-            <img
-              src={profile.mutint_Profile_img || defaultImgUrl}
-              alt="Profile image"
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = defaultImgUrl;
-              }}
-              className="rounded-[6px] w-[218px] h-[218px] max-md:w-full"
-            />
-            {isBookmarked ? (
-              <MdBookmark
-                onClick={onBookmarkToggle}
-                className={`absolute top-2 right-2 text-white text-[22px] cursor-pointer ${isUpdating ? 'opacity-50' : ''
-                  }`}
+    <>
+      <PlatinumModal
+        isOpen={isPlatinumModalOpen}
+        onClose={() => setIsPlatinumModalOpen(false)}
+      />
+      <div
+        className="flex justify-start items-center space-x-5 relative rounded-xl shadow-profileCardShadow p-5 mb-5"
+        onClick={() => handleProfileClick(profile.mutint_profileid, sortBy)}
+      >
+        {activeProfileId === profile.mutint_profileid && (
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white bg-opacity-70 rounded-xl">
+            <Hearts height="80" width="80" color="#FF6666" visible={true} />
+            <p className="mt-2 text-sm text-primary">Please wait...</p>
+          </div>
+        )}
+        <div className="w-full flex justify-between items-center">
+          <div className="flex justify-between items-center space-x-5 max-sm:flex-col max-sm:gap-5 max-sm:w-full max-sm:items-start">
+            <div className="relative max-sm:w-full">
+              <img
+                src={profile.mutint_Profile_img || defaultImgUrl}
+                alt="Profile image"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = defaultImgUrl;
+                }}
+                className="rounded-[6px] w-[218px] h-[218px] max-md:w-full"
               />
-            ) : (
-              <MdBookmarkBorder
-                onClick={onBookmarkToggle}
-                className={`absolute top-2 right-2 text-white text-[22px] cursor-pointer ${isUpdating ? 'opacity-50' : ''
-                  }`}
-              />
+              {isBookmarked ? (
+                <MdBookmark
+                  onClick={onBookmarkToggle}
+                  className={`absolute top-2 right-2 text-white text-[22px] cursor-pointer ${isUpdating ? 'opacity-50' : ''
+                    }`}
+                />
+              ) : (
+                <MdBookmarkBorder
+                  onClick={onBookmarkToggle}
+                  className={`absolute top-2 right-2 text-white text-[22px] cursor-pointer ${isUpdating ? 'opacity-50' : ''
+                    }`}
+                />
+              )}
+            </div>
+
+            <div>
+              <div className="relative mb-2">
+                <div className="flex items-center">
+                  <h5 className="text-[20px] text-secondary font-semibold cursor-pointer">
+                    {profile.mutint_profile_name || "Unknown"}{" "}
+                    <span className="text-sm text-ashSecondary">
+                      ({profile.mutint_profileid || "N/A"})
+                    </span>
+                  </h5>
+                  <MdVerifiedUser className="text-[20px] text-checkGreen ml-2" />
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3 mb-2">
+                <p className="flex items-center text-sm text-primary font-normal">
+                  <IoCalendar className="mr-2 text-primary" />
+                  {profile.mutint_profile_age || "N/A"} yrs
+                </p>
+              </div>
+
+              <div className="mb-2">
+                <p className="flex items-center text-sm text-primary font-normal">
+                  <MdStars className="mr-2 text-primary" />
+                  {profile.mutint_star || "N/A"}
+                </p>
+              </div>
+              <div className="mb-2">
+                <p className="flex items-center text-sm text-primary font-normal">
+                  <IoSchool className="mr-2 text-primary" />
+                  {profile.mutint_degree || "N/A"}
+                </p>
+              </div>
+              <div className="mb-2">
+                <p className="flex items-center text-sm text-primary font-normal">
+                  <FaSuitcase className="mr-2 text-primary" />
+                  {profile.mutint_profession || "N/A"}
+                </p>
+              </div>
+              <div className="mb-2">
+                <p className="flex items-center text-sm text-primary font-normal">
+                  <FaLocationDot className="mr-2 text-primary" />
+                  {profile.mutint_city || "N/A"}
+                </p>
+              </div>
+
+              <div className="flex justify-start items-center gap-3 max-2xl:flex-wrap">
+                <div>
+                  <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
+                    <MdOutlineGrid3X3 className="mr-2 text-primary" />{" "}
+                    {profile.mutint_horoscope || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
+                    <FaUser className="mr-2 text-primary" /> {profile.mutint_userstatus}
+                  </p>
+                </div>
+                <div>
+                  <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
+                    <IoCalendar className="mr-2 text-primary" /> Last visit on{" "}
+                    {profile.mutint_lastvisit}
+                  </p>
+                </div>
+                <div>
+                  <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
+                    <IoEye className="mr-2 text-primary" /> {profile.mutint_views} views
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          {profile.mutint_match_score !== undefined &&
+            profile.mutint_match_score > 50 && (
+              <div className="max-lg:hidden">
+                <MatchingScore scorePercentage={profile.mutint_match_score} />
+              </div>
             )}
-          </div>
-
-          <div>
-            <div className="relative mb-2">
-              <div className="flex items-center">
-                <h5 className="text-[20px] text-secondary font-semibold cursor-pointer">
-                  {profile.mutint_profile_name || "Unknown"}{" "}
-                  <span className="text-sm text-ashSecondary">
-                    ({profile.mutint_profileid || "N/A"})
-                  </span>
-                </h5>
-                <MdVerifiedUser className="text-[20px] text-checkGreen ml-2" />
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3 mb-2">
-              <p className="flex items-center text-sm text-primary font-normal">
-                <IoCalendar className="mr-2 text-primary" />
-                {profile.mutint_profile_age || "N/A"} yrs
-              </p>
-            </div>
-
-            <div className="mb-2">
-              <p className="flex items-center text-sm text-primary font-normal">
-                <MdStars className="mr-2 text-primary" />
-                {profile.mutint_star || "N/A"}
-              </p>
-            </div>
-            <div className="mb-2">
-              <p className="flex items-center text-sm text-primary font-normal">
-                <IoSchool className="mr-2 text-primary" />
-                {profile.mutint_degree || "N/A"}
-              </p>
-            </div>
-            <div className="mb-2">
-              <p className="flex items-center text-sm text-primary font-normal">
-                <FaSuitcase className="mr-2 text-primary" />
-                {profile.mutint_profession || "N/A"}
-              </p>
-            </div>
-            <div className="mb-2">
-              <p className="flex items-center text-sm text-primary font-normal">
-                <FaLocationDot className="mr-2 text-primary" />
-                {profile.mutint_city || "N/A"}
-              </p>
-            </div>
-
-            <div className="flex justify-start items-center gap-3 max-2xl:flex-wrap">
-              <div>
-                <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
-                  <MdOutlineGrid3X3 className="mr-2 text-primary" />{" "}
-                  {profile.mutint_horoscope || "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
-                  <FaUser className="mr-2 text-primary" /> {profile.mutint_userstatus}
-                </p>
-              </div>
-              <div>
-                <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
-                  <IoCalendar className="mr-2 text-primary" /> Last visit on{" "}
-                  {profile.mutint_lastvisit}
-                </p>
-              </div>
-              <div>
-                <p className="flex items-center bg-gray px-2 py-0.5 rounded-md text-ashSecondary font-semibold">
-                  <IoEye className="mr-2 text-primary" /> {profile.mutint_views} views
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
-        {profile.mutint_match_score !== undefined &&
-          profile.mutint_match_score > 50 && (
-            <div className="max-lg:hidden">
-              <MatchingScore scorePercentage={profile.mutint_match_score} />
-            </div>
-          )}
       </div>
-    </div>
+    </>
   );
 };
