@@ -1189,7 +1189,7 @@ export const ProfileDetailsExpressInterest: React.FC<
                       {/* Last Visit */}
                       <div>
                         <p className="flex items-center bg-gray px-2 py-0.5 rounded-[4px] text-sm text-ashSecondary font-medium">
-                          <img src={AgeIcon} className="w-4 mr-2" /> Last visit on {profileData?.basic_details.last_visit}                      </p>
+                          <img src={AgeIcon} className="w-4 mr-2" /> Last visited on {profileData?.basic_details.last_visit}                      </p>
                       </div>
 
                       {/* views */}

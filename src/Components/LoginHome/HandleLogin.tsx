@@ -47,8 +47,8 @@ export const HandleLogin = () => {
     <div>
       <HeroSlider />
       <MatchingProfiles />
-      <FeaturedProfiles />
-      <SuggestedProfiles />
+      {/* <FeaturedProfiles />
+      <SuggestedProfiles /> */}
       {/* <VysyamalaStore /> */}
       
       {/* <VysyaBazaar /> */}

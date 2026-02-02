@@ -35,6 +35,8 @@ import { MdToggleOff, MdToggleOn } from "react-icons/md";
 import { ToastContainer } from "react-toastify";
 import PaginationNew from "../PaginationNew";
 import { decryptId, encryptId } from "../../utils/cryptoUtils";
+import { SuggestedProfiles } from "./SuggestedProfiles";
+import { FeaturedProfiles } from "./FeaturedProfiles";
 // import { log } from "console";
 
 // const items = [
@@ -799,6 +801,8 @@ export const MatchingProfiles = () => {
           </>
         )}
       </div>
+      <FeaturedProfiles />
+      <SuggestedProfiles />
       {/* <ToastNotification /> */}
       <ToastContainer
         position="top-right"
