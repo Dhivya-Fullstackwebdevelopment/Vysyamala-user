@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { IoClose } from 'react-icons/io5';
 //import axios from 'axios';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import apiClient from '../../../API';
+import { decryptId } from '../../../utils/cryptoUtils';
 // import { Hearts } from 'react-loader-spinner';
 
 interface VysAssistPopupProps {
@@ -22,8 +23,11 @@ export const VysAssistPopup: React.FC<VysAssistPopupProps> = ({ closePopup, prof
     const [, setData] = useState<any>()
     // console.log(data)
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
-    const queryParams = new URLSearchParams(location.search);
-    const id = queryParams.get('id');
+    // const queryParams = new URLSearchParams(location.search);
+    // const id = queryParams.get('id');
+    const [searchParams] = useSearchParams();
+    const encryptedId = searchParams.get("id") || "";
+    const id = decryptId(encryptedId);
     const navigate = useNavigate()
     const formattedMessage = `We have shared the horoscope to ${loginuser_profileId}`;
     const [, setLoading] = useState(false);
