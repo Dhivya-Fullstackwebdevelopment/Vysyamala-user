@@ -19,8 +19,27 @@ const profileIdSchema = z.object({
   //     /^(VY\d{6}|[A-Za-z\s]+)$/,
   //     "Search input must be a Profile ID (e.g., VY123456) or a Profile Name"
   //   ),
-  profile_id: z.string().min(1, "Profile ID or Profile Name is required"),
+  // profile_id: z.string().min(1, "Profile ID or Profile Name is required"),
+  profile_id: z
+    .string()
+    .min(1, "Profile ID or Profile Name is required")
+    .refine((val) => {
+      const currentUserGender = localStorage.getItem("gender")?.toLowerCase();
+      const input = val.toUpperCase();
 
+      // If user is Male, they should not be searching for "VM"
+      if (currentUserGender === "male" && input.startsWith("VM")) {
+        return false;
+      }
+      // If user is Female, they should not be searching for "VF"
+      if (currentUserGender === "female" && input.startsWith("VF")) {
+        return false;
+      }
+      return true;
+    }, {
+      // This is the dynamic message that will show up in errors.profile_id
+      message: "This profile does not match your gender preference.",
+    }),
 });
 
 // Define the type for the form inputs based on the schema
