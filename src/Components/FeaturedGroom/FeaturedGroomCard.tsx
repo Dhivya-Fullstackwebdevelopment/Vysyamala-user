@@ -77,7 +77,7 @@ export const FeaturedGroomCard: React.FC = () => {
 
     return (
         <div className="container mx-auto mt-28 mb-10  max-md:mt-20 max-md:mb-8">
-            <h2 className="text-3xl font-bold mb-6 max-lg:text-xl max-lg:mb-3">Featured Groom</h2>
+            <h2 className="text-3xl font-bold mb-6 max-lg:text-xl max-lg:mb-3">Featured Grooms</h2>
             {loading ? (
                 <div className="flex flex-col items-center justify-center min-h-[300px]">
                     <Hearts
