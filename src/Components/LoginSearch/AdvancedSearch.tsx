@@ -130,7 +130,7 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
     setError,
     // handleSubmit,
     // formState: { errors },
-     formState: {  },
+    formState: { },
   } = useForm<ProfileIdForm>({
     resolver: zodResolver(profileIdSchema),
   });
@@ -212,6 +212,7 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
 
   const onProfileIdSubmit = (data: ProfileIdForm) => {
     Search_By_profileId(data.profile_id);
+    navigate('/Search/SearchProfiles');
   };
 
   const handleAdvancedSearchSubmit = (_data: AdvancedSearchForm) => {
@@ -233,11 +234,11 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
   //     onFindMatch();
   //     // navigate('/Search/SearchProfiles');
   // };
-  const handleSearch = () => {
-    // Just navigate to the new results route.
-    // The context already holds all the form values.
-    navigate('/Search/FindMatch');
-  };
+  // const handleSearch = () => {
+  //   // Just navigate to the new results route.
+  //   // The context already holds all the form values.
+  //   navigate('/Search/FindMatch');
+  // };
 
   const handlePeopleWithPhotoChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -593,15 +594,22 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
                       //   setFromAge(Number(value));
 
                       // }}
+                      // onChange={(e) => {
+                      //   const val = e.target.value;
+                      //   // Convert to number for context and form validation
+                      //   const numVal = val === "" ? "" : Number(val);
+
+                      //   setFromAge(Number(val)); // Update your Context state
+
+                      //   // Explicitly cast to match the expected Zod type
+                      //   advancedForm.setValue("fromAge", numVal as number | "" | undefined, { shouldValidate: true });
+                      // }}
                       onChange={(e) => {
                         const val = e.target.value;
-                        // Convert to number for context and form validation
                         const numVal = val === "" ? "" : Number(val);
-
-                        setFromAge(Number(val)); // Update your Context state
-
-                        // Explicitly cast to match the expected Zod type
-                        advancedForm.setValue("fromAge", numVal as number | "" | undefined, { shouldValidate: true });
+                        setFromAge(Number(val)); // Context update
+                        // This tells the form to re-run the superRefine validation
+                        advancedForm.setValue("fromAge", numVal as any, { shouldValidate: true });
                       }}
                       id="age"
                       name="age"
@@ -609,7 +617,9 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
                       className="outline-none w-full px-3 py-[13px] text-placeHolderColor border border-footer-text-gray rounded"
                     />
                     {advancedForm.formState.errors.fromAge && (
-                      <p className="text-red-500 text-xs mt-1">{advancedForm.formState.errors.fromAge.message}</p>
+                      <p className="text-red-500 text-xs mt-1">
+                        {advancedForm.formState.errors.fromAge.message}
+                      </p>
                     )}
                   </div>
                   <div className="w-full">
@@ -649,15 +659,22 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
                       //   setToAge(Number(value));
 
                       // }}
+                      // onChange={(e) => {
+                      //   const val = e.target.value;
+                      //   // Convert to number for context and form validation
+                      //   const numVal = val === "" ? "" : Number(val);
+
+                      //   setToAge(Number(val)); // Update your Context state
+
+                      //   // Explicitly cast to match the expected Zod type
+                      //   advancedForm.setValue("toAge", numVal as number | "" | undefined, { shouldValidate: true });
+                      // }}
                       onChange={(e) => {
                         const val = e.target.value;
-                        // Convert to number for context and form validation
                         const numVal = val === "" ? "" : Number(val);
-
-                        setToAge(Number(val)); // Update your Context state
-
-                        // Explicitly cast to match the expected Zod type
-                        advancedForm.setValue("toAge", numVal as number | "" | undefined, { shouldValidate: true });
+                        setToAge(Number(val)); // Context update
+                        // This tells the form to re-run the superRefine validation
+                        advancedForm.setValue("toAge", numVal as any, { shouldValidate: true });
                       }}
                       placeholder="To"
                       className="outline-none w-full px-3 py-[13px] text-placeHolderColor border border-footer-text-gray rounded"
@@ -1180,7 +1197,7 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
               </button>
               <button
                 // onClick={() => handleSearch()}
-                onClick={handleSearch}
+                //onClick={handleSearch}
                 // disabled={disableFindMatch}
                 type="submit"
                 className="flex items-center text-sm py-[10px] px-6 bg-gradient text-white rounded-[6px] mt-2"
