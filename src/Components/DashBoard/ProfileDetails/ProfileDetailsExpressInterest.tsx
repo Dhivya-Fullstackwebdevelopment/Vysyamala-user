@@ -64,6 +64,7 @@ interface PersonalDetails {
 }
 
 interface ProfileData {
+  encrypted_profile_id: string;
   horoscope_details: HoroscopeDetails;
   education_details: EducationDetails;
   basic_details: BasicDetails;
@@ -117,7 +118,7 @@ export const ProfileDetailsExpressInterest: React.FC<
   const custom_message = localStorage.getItem("custom_message");
   const storedPlanId = localStorage.getItem("plan_id") || sessionStorage.getItem("plan_id");
   const isPlan16 = storedPlanId === "16";
-
+  const [serverEncryptedId, setServerEncryptedId] = useState<string>("");
 
   ////console.log("vysya", storedPlanId);
   const navigate = useNavigate();
@@ -326,7 +327,9 @@ export const ProfileDetailsExpressInterest: React.FC<
           setProfileData(null); // Ensure profile data is cleared if this error occurs
           return; // Stop processing the rest of the success logic
         }
-        // Store the response data for Vys Assist
+        if (response.data.encrypted_profile_id) {
+          setServerEncryptedId(response.data.encrypted_profile_id);
+        }
         setVysAssistData(response.data);
 
         await apiClient.post("/auth/Create_profile_visit/", {
@@ -731,19 +734,21 @@ export const ProfileDetailsExpressInterest: React.FC<
 
   // Horoscope Download Function
   const handleDownloadPdf = () => {
+    const encodedId = encodeURIComponent(serverEncryptedId);
     const link = document.createElement("a");
     link.target = '_blank'; // Open in a new tab
     // link.href = `${config.apiUrl}/auth/generate-pdf/${loginuser_profileId}/${idparam}`;
-    link.href = `${config.apiUrl}/auth/New_horoscope_black/${idparam}/${loginuser_profileId}/`;
+    link.href = `${config.apiUrl}/auth/New_horoscope_black/${encodedId}/${encodedId}/`;
     // link.href = `http://103.214.132.20:8000/auth/generate-pdf/${loginuser_profileId}/${idparam}`;
     link.download = `pdf_${idparam}.pdf`; // Customize the file name
     link.click();
   };
   const handleDownloadColorPdf = () => {
+    const encodedId = encodeURIComponent(serverEncryptedId);
     const link = document.createElement("a");
     link.target = '_blank'; // Open in a new tab
     // link.href = `${config.apiUrl}/auth/generate-pdf/${loginuser_profileId}/${idparam}`;
-    link.href = `${config.apiUrl}/auth/New_horoscope_color/${idparam}/${loginuser_profileId}/`;
+    link.href = `${config.apiUrl}/auth/New_horoscope_color/${encodedId}/${encodedId}/`;
     // link.href = `http://103.214.132.20:8000/auth/generate-pdf/${loginuser_profileId}/${idparam}`;
     link.download = `pdf_${idparam}.pdf`; // Customize the file name
     link.click();
