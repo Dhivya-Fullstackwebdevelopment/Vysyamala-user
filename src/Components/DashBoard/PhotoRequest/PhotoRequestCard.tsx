@@ -8,7 +8,6 @@ import {
   MdStars,
   MdVerifiedUser,
 } from "react-icons/md";
-import axios from "axios";
 import { Update_photo_request } from "../../../commonapicall";
 import {
   ToastNotification,
@@ -212,7 +211,7 @@ const PhotoRequestCard = ({
     };
 
     try {
-      const response = await axios.post(Update_photo_request, payload);
+      const response = await apiClient.post(Update_photo_request, payload);
       if (response.status === 200 && response.data.Status === 1) {
         if (status === "2") {
           NotifySuccess("Photo request accepted successfully");
@@ -306,7 +305,7 @@ const PhotoRequestCard = ({
     if (!selectedProfileId) return;
 
     try {
-      const response = await axios.post(Update_photo_request, {
+      const response = await apiClient.post(Update_photo_request, {
         profile_id: loginuser_profileId,
         profile_from: selectedProfileId,
         status: "3",

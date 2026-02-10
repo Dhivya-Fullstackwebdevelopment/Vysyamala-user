@@ -7,6 +7,7 @@ import { MdBookmark, MdBookmarkBorder } from "react-icons/md";
 import { IoSchool } from "react-icons/io5";
 import { Hearts } from "react-loader-spinner";
 import { LoginPopupModal } from "../HomePage/PopUpsLogin/LoginPopupModal";
+import config from "../../Config";
 
 // Define the interface for a profile
 interface Profile {
@@ -30,7 +31,7 @@ interface ApiResponse {
 
 const defaultImgUrl = "https://vysyamat.blob.core.windows.net/vysyamala/default_bride.png";
 
-const API_URL = "https://app.vysyamala.com/auth/Get_featured_profiles/";
+const API_URL = `${config.apiUrl}/auth/Get_featured_profiles/`;
 //const API_URL = "http://103.214.132.20:8000/auth/Get_featured_profiles/";
 
 export const FeaturedBrideCard: React.FC = () => {

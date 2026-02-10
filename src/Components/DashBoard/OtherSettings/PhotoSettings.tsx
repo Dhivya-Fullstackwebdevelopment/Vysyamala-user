@@ -75,59 +75,38 @@ export const PhotoSettings = () => {
     }
 
     const formData = new FormData();
-
     formData.append("profile_id", loginuser_profile_id);
-    if (selectedHoroscopeImage)
-      formData.append("horoscope_file", selectedHoroscopeImage);
+
+    if (selectedHoroscopeImage) formData.append("horoscope_file", selectedHoroscopeImage);
     if (selectedIDProof) formData.append("idproof_file", selectedIDProof);
-    if (selectedDivorceProof)
-      formData.append("divorcepf_file", selectedDivorceProof);
-    formData.append(
-      "photo_password",
-      isChecked ? getValues("password") || "" : ""
-    );
+    if (selectedDivorceProof) formData.append("divorcepf_file", selectedDivorceProof);
+
+    formData.append("photo_password", isChecked ? getValues("password") || "" : "");
     formData.append("photo_protection", isChecked ? "1" : "0");
-    formData.append("Video_url", videoUrl); // Replace with actual static value
-    //  const filePreview = URL.createObjectURL(file);
-    //   setUploadingImages((prev) => [...prev, filePreview]);
-    // if (allowVisit !== null) {
-    //   formData.append("allow_visit", allowVisit.toString());
-    // } else {
-    //   formData.append("allow_visit", "1"); // Default fallback if still null
-    // }
-    // ✅ Send allow_visit only for plan_id 16
+    formData.append("Video_url", videoUrl);
+
     if (storedPlanId === "16" && allowVisit !== null) {
-      formData.append("allow_visit", allowVisit.toString()); // "0" or "1"
+      formData.append("allow_visit", allowVisit.toString());
     }
 
-
     try {
-      const response = await fetch(
-        "https://app.vysyamala.com/auth/Photo_Id_Settings/",
-        //"http://103.214.132.20:8000/auth/Photo_Id_Settings/",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      // Using Axios apiClient instead of fetch
+      const response = await apiClient.post("/auth/Photo_Id_Settings/", formData);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error:", errorData);
-        alert("Failed to upload. Please try again.");
-        return;
-      }
-      // setUploadingImages((prev) => prev.filter((img) => img !== filePreview));
-      const result = await response.json();
-      console.log("Success:", result);
-      // alert("Data uploaded successfully.");
+      // Axios resolves if status is 2xx, so no need for !response.ok check
+      console.log("Success:", response.data);
       NotifySuccess('Photo Settings updated successfully');
-      reset(); // Reset form fields
-      // Re-fetch the uploaded images after successful upload
-      fetchUploadedImages();
-    } catch (error) {
-      console.error("Error:", error);
-      NotifyError("An error occurred. Please try again.");
+
+      reset(); // Reset react-hook-form
+      resetForm(); // Reset your local states
+      fetchUploadedImages(); // Refresh the data
+
+    } catch (error:any) {
+      // Axios puts the error response inside error.response
+      console.error("Error details:", error.response?.data || error.message);
+
+      const errorMessage = error.response?.data?.message || "Failed to upload. Please try again.";
+      NotifyError(errorMessage);
     }
   };
 

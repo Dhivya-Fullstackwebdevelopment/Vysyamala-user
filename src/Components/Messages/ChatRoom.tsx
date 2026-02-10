@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import config from '../../Config';
 
 interface Message {
     username: string;
@@ -19,7 +20,7 @@ export const ChatRoom: React.FC = () => {
     // Fetch chat history from the server
     const fetchChatHistory = async () => {
         try {
-            const response = await fetch(`https://app.vysyamala.com/auth/getMessages/${room_name}/`, {
+            const response = await fetch(`${config.apiUrl}/auth/getMessages/${room_name}/`, {
                 //const response = await fetch(`http://103.214.132.20:8000/auth/getMessages/${room_name}/`, {
                 method: 'GET',
                 headers: {

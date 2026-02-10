@@ -14,6 +14,7 @@ import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { FaRegListAlt } from 'react-icons/fa';
 import { ProfileDataProvider } from './ViewApicall/ProfileDataProvider';
 import { decryptId, encryptId } from '../../../utils/cryptoUtils';
+import config from '../../../Config';
 
 
 interface ProfileDetailsSettingsViewProps { }
@@ -70,13 +71,13 @@ export const ProfileDetailsSettingsView: React.FC<ProfileDetailsSettingsViewProp
             setLoading(true);
             try {
                 const apiEndpoints: Record<string, string> = {
-                    "1": 'https://app.vysyamala.com/auth/Get_mutual_intrests/',
-                    "2": 'https://app.vysyamala.com/auth/Get_profile_wishlist/',
-                    "3": 'https://app.vysyamala.com/auth/My_intrests_list/',
-                    "4": 'https://app.vysyamala.com/auth/My_viewed_profiles/',
-                    "5": 'https://app.vysyamala.com/auth/My_profile_visit/',
-                    "6": 'https://app.vysyamala.com/auth/Get_photo_request_list/',
-                    // "7": 'https://app.vysyamala.com/auth/Get_Gallery_lists/',
+                    "1": `${config.apiUrl}/auth/Get_mutual_intrests/`,
+                    "2": `${config.apiUrl}/auth/Get_profile_wishlist/`,
+                    "3": `${config.apiUrl}/auth/My_intrests_list/`,
+                    "4": `${config.apiUrl}/auth/My_viewed_profiles/`,
+                    "5": `${config.apiUrl}/auth/My_profile_visit/`,
+                    "6": `${config.apiUrl}/auth/Get_photo_request_list/`,
+                    // "7": `${config.apiUrl}/auth/Get_Gallery_lists/`,
                     // "1": 'http://103.214.132.20:8000/auth/Get_mutual_intrests/',
                     // "2": 'http://103.214.132.20:8000/auth/Get_profile_wishlist/',
                     // "3": 'http://103.214.132.20:8000/auth/My_intrests_list/',
@@ -85,7 +86,7 @@ export const ProfileDetailsSettingsView: React.FC<ProfileDetailsSettingsViewProp
                     // "6": 'http://103.214.132.20:8000/auth/Get_photo_request_list/',
                 };
 
-                const apiEndpoint = apiEndpoints[pageid] || 'https://app.vysyamala.com/auth/Get_prof_list_match/';
+                const apiEndpoint = apiEndpoints[pageid] || `${config.apiUrl}/auth/Get_prof_list_match/`;
                 //const apiEndpoint = apiEndpoints[pageid] || 'http://103.214.132.20:8000/auth/Get_prof_list_match/';
 
                 const requestBody: any = {

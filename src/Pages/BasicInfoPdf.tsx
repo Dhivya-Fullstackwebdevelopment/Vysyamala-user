@@ -1,8 +1,9 @@
-import  { useContext, useEffect, useState } from "react";
-import {  useSearchParams } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ProfileContext } from "../ProfileContext";
 import axios from "axios";
 import apiClient from "../API";
+import config from "../Config";
 
 interface GetProfileDetMatch {
   profile_id: string;
@@ -74,34 +75,34 @@ export const BasicInfoPdf = () => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
 
-    //   const [searchParams] = useSearchParams("");
-    // const encodedData = searchParams.get("data");
+  //   const [searchParams] = useSearchParams("");
+  // const encodedData = searchParams.get("data");
 
-    // Decode and parse the profile data
-    // const profileData = encodedData ? JSON.parse(atob(encodedData)) : null;
+  // Decode and parse the profile data
+  // const profileData = encodedData ? JSON.parse(atob(encodedData)) : null;
 
 
   return (
     <div>
       <div className="container">
         <div className="w-[450px] max-sm:w-fit flex flex-col items-center p-10  mx-auto my-28 max-md:my-20 bg-gray-50 shadow-profileCardShadow">
-         
+
           <div className="w-full">
             <div className="flex justify-start mb-6">
               <img
                 src={
-                 
-                 "https://app.vysyamala.com/media/default_groom.png"
-                    //"http://103.214.132.20:8000/media/default_groom.png"
+
+                  `${config.apiUrl}/media/default_groom.png`
+                  //"http://103.214.132.20:8000/media/default_groom.png"
                 }
                 alt={profileDetails?.personal_profile_name || "Name not available"}
                 className="w-full h-[300px]  object-contain rounded-3xl  shadow-redboxshadow hover:scale-105 transition-transform duration-300"
               />
             </div>
             <div className="text-start space-y-4">
-            <h1 className="text-4xl sm:text-3xl font-semibold text-gray-800 mb-5 text-start">
-            {profileDetails?.personal_profile_name || "Profile Details"}
-          </h1>
+              <h1 className="text-4xl sm:text-3xl font-semibold text-gray-800 mb-5 text-start">
+                {profileDetails?.personal_profile_name || "Profile Details"}
+              </h1>
               <p className="text-lg text-gray-600">
                 <span className="font-medium text-gray-700">Profile ID :</span> {profileDetails?.profile_id || "N/A"}
               </p>
@@ -115,10 +116,10 @@ export const BasicInfoPdf = () => {
                 <span className="font-medium text-gray-700">About :</span> {profileDetails?.personal_about_self || "N/A"}
               </p>
               <p className="text-lg text-gray-600">
-                <span className="font-medium text-gray-700">Education :</span> {profileDetails?. heightest_education || "N/A"}
+                <span className="font-medium text-gray-700">Education :</span> {profileDetails?.heightest_education || "N/A"}
               </p>
               <p className="text-lg text-gray-600">
-                <span className="font-medium text-gray-700">Profession :</span> {profileDetails?.prosession  || "N/A"}
+                <span className="font-medium text-gray-700">Profession :</span> {profileDetails?.prosession || "N/A"}
               </p>
             </div>
           </div>

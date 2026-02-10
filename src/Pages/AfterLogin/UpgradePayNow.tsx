@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { AddOns } from "../../Components/PayNow/AddOns";
 import { Link, useNavigate } from "react-router-dom";
 import { cancelPayment, createOrder, Get_addon_packages, savePlanPackage, verifyPayment } from "../../commonapicall";
-import axios from "axios";
 import { ToastNotification, NotifyError, NotifySuccess } from "../../Components/Toast/ToastNotification";
 import { GPayPopup } from "../PayNowRegistration/GPayPopup";
 import { ConfirmationPopup } from "../PayNowRegistration/ConfirmationPopup";
+import apiClient from "../../API";
 
 interface Package {
   package_id: number;
@@ -32,7 +32,7 @@ export const UpgradePayNow: React.FC = () => {
   const [popupHeading, setPopupHeading] = useState("Thank You");
 
   const fetchData = async () => {
-    const response = await axios.post(Get_addon_packages);
+    const response = await apiClient.post(Get_addon_packages);
     try {
       if (response.status === 200) {
         setMemberShipPlane(response.data.data);

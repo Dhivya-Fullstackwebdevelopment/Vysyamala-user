@@ -2,6 +2,7 @@ import { ProfileContacts } from '../../Components/Messages/ProfileContacts';
 import { ProfileChatArea } from '../../Components/Messages/ProfileChatArea';
 import { useContext, useEffect, useState } from 'react';
 import { ProfileContext } from '../../ProfileContext';
+import config from '../../Config';
 
 
 
@@ -87,7 +88,7 @@ export const Messages = () => {
       setSelectedProfile({
         room_name_id: 'VY240001VY240023',
 
-         profile_image: 'https://app.vysyamala.com/media/profile_VY240023/images.jpeg',
+         profile_image: `${config.apiUrl}/media/profile_VY240023/images.jpeg`,
         //profile_image: 'http://103.214.132.20:8000/media/profile_VY240023/images.jpeg',
         profile_user_name: 'User23',
         profile_lastvist: '(October 22, 2024)',

@@ -14,6 +14,7 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { update_photo_password } from "../commonapicall";
 import apiClient from "../API";
+import config from "../Config";
 interface UploadImagesProps { }
 
 // Define an interface for uploaded images
@@ -266,25 +267,25 @@ const UploadImages: React.FC<UploadImagesProps> = () => {
 
     await uploadImages(
       selectedFiles,
-      "https://app.vysyamala.com/auth/ImageSetUpload/",
+      `${config.apiUrl}/auth/ImageSetUpload/`,
       //"http://103.214.132.20:8000/auth/ImageSetUpload/",
       "image_files"
     );
     await uploadImages(
       selectedHoroscopeFiles,
-      "https://app.vysyamala.com/auth/Horoscope_upload/",
+      `${config.apiUrl}/auth/Horoscope_upload/`,
       // "http://103.214.132.20:8000/auth/Horoscope_upload/",
       "horoscope_file"
     );
     await uploadImages(
       selectedDivorceProofFiles,
-      "https://app.vysyamala.com/auth/Divorceproof_upload/",
+      `${config.apiUrl}/auth/Divorceproof_upload/`,
       //"http://103.214.132.20:8000/auth/Divorceproof_upload/",
       "divorcepf_file"
     );
     await uploadImages(
       selectedIDProofFiles,
-      "https://app.vysyamala.com/auth/Idproof_upload/",
+      `${config.apiUrl}/auth/Idproof_upload/`,
       // "http://103.214.132.20:8000/auth/Idproof_upload/",
       "idproof_file"
     );
@@ -308,7 +309,7 @@ const UploadImages: React.FC<UploadImagesProps> = () => {
 
   const handle_Update_photo_password = async (password: string) => {
     try {
-      const response = await axios.post(update_photo_password, {
+      const response = await apiClient.post(update_photo_password, {
         profile_id: loginuser_profile_id,
         photo_password: password,
         photo_protection: isChecked ? 1 : 0,

@@ -17,6 +17,7 @@ import { NotifySuccess, ToastNotification } from "../../Components/Toast/ToastNo
 //import closebtn from "@/assets/icons/closebtn.png";
 import UploadFile from "../../Components/UploadImages/UploadFile";
 import apiClient from "../../API";
+import config from "../../Config";
 interface UploadImagesProps { }
 
 // Define an interface for uploaded images
@@ -218,25 +219,25 @@ const UploadImages: React.FC<UploadImagesProps> = () => {
 
     await uploadImages(
       selectedFiles,
-      "https://app.vysyamala.com/auth/ImageSetUpload/",
+      `${config.apiUrl}/auth/ImageSetUpload/`,
       //"http://103.214.132.20:8000/auth/ImageSetUpload/",
       "image_files"
     );
     await uploadImages(
       selectedHoroscopeFiles,
-      "https://app.vysyamala.com/auth/Horoscope_upload/",
+      `${config.apiUrl}/auth/Horoscope_upload/`,
       //"http://103.214.132.20:8000/auth/Horoscope_upload/",
       "horoscope_file"
     );
     await uploadImages(
       selectedDivorceProofFiles,
-      "https://app.vysyamala.com/auth/Divorceproof_upload/",
+      `${config.apiUrl}/auth/Divorceproof_upload/`,
       //"http://103.214.132.20:8000/auth/Divorceproof_upload/",
       "divorcepf_file"
     );
     await uploadImages(
       selectedIDProofFiles,
-      "https://app.vysyamala.com/auth/Idproof_upload/",
+      `${config.apiUrl}/auth/Idproof_upload/`,
       //"http://103.214.132.20:8000/auth/Idproof_upload/",
       "idproof_file"
     );

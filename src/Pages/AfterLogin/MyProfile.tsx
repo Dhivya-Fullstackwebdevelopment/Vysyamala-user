@@ -20,6 +20,7 @@ import { Helmet } from "react-helmet";
 import apiClient from "../../API";
 import { Hearts } from "react-loader-spinner";
 import { toast } from "react-toastify";
+import config from "../../Config";
 
 // import { useNavigate } from "react-router-dom";
 
@@ -265,7 +266,7 @@ export const MyProfile = () => {
     // link.href = `https://apiupg.rainyseasun.com/auth/generate-pdf/${loginuser_profileId}/${Get_profile_det_match?.profile_id}`;
     // link.download = `pdf_${Get_profile_det_match?.profile_id}.pdf`; // Customize the file name
 
-    link.href = `https://app.vysyamala.com/auth/My_horoscope_pdf_color/${get_myprofile_personal?.profile_id}/`;
+    link.href = `${config.apiUrl}/auth/My_horoscope_pdf_color/${get_myprofile_personal?.profile_id}/`;
     //link.href = `http://103.214.132.20:8000/auth/My_horoscope_pdf_color/${get_myprofile_personal?.profile_id}/`;
 
     // link.download = `pdf_${get_myprofile_personal?.profile_id}.pdf`; // Customize the file name
@@ -279,7 +280,7 @@ export const MyProfile = () => {
     // link.href = `https://apiupg.rainyseasun.com/auth/generate-pdf/${loginuser_profileId}/${Get_profile_det_match?.profile_id}`;
     // link.download = `pdf_${Get_profile_det_match?.profile_id}.pdf`; // Customize the file name
 
-    link.href = `https://app.vysyamala.com/auth/My_horoscope_black/${get_myprofile_personal?.profile_id}/`;
+    link.href = `${config.apiUrl}/auth/My_horoscope_black/${get_myprofile_personal?.profile_id}/`;
     // link.href = `http://103.214.132.20:8000/auth/My_horoscope_black/${get_myprofile_personal?.profile_id}/`;
 
     // link.download = `pdf_${get_myprofile_personal?.profile_id}.pdf`; // Customize the file name
@@ -495,10 +496,10 @@ export const MyProfile = () => {
         />
         <meta
           property="og:image"
-          content={'https://app.vysyamala.com/media/default_groom.png'} // Use placeholder if no image
+          content={`${config.apiUrl}/media/default_groom.png`} // Use placeholder if no image
         // content={'http://103.214.132.20:8000/media/default_groom.png'} // Use placeholder if no image
         />
-        <meta property="og:url" content={'https://app.vysyamala.com/media/default_groom.png'} />
+        <meta property="og:url" content={`${config.apiUrl}/media/default_groom.png`} />
         {/* <meta property="og:url" content={'http://103.214.132.20:8000/media/default_groom.png'} /> */}
       </Helmet>
       <div className="bg-grayBg py-20 max-lg:py-14 max-md:py-10 max-sm:py-10">

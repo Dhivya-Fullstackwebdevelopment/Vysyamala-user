@@ -6,7 +6,6 @@ import {
   Get_photo_bypassword,
 } from "../../../commonapicall";
 import "./ProfileSlickStyleView.css";
-import axios from "axios";
 import { GoAlertFill } from "react-icons/go";
 import {
   ToastNotification,
@@ -16,6 +15,7 @@ import {
 import { RotatingSquare } from "react-loader-spinner";
 import { decryptId } from "../../../utils/cryptoUtils";
 import { useSearchParams } from "react-router-dom";
+import apiClient from "../../../API";
 
 interface UserImages {
   [key: string]: string;
@@ -358,7 +358,7 @@ export const ProfileSlickView: React.FC<ProfileSlickViewProps> = ({
           return;
         }
 
-        const response = await axios.post<{
+        const response = await apiClient.post<{
           status: string;
           message?: string;
           data?: {

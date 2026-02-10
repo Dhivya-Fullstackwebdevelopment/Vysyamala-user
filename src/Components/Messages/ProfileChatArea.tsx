@@ -5,6 +5,7 @@ import { IoMdSend } from 'react-icons/io';
 import SenderMessageTail from "../../assets/images/SenderMessageTail.png";
 import ReceiverMessageTail from "../../assets/images/ReceiverMessageTail.png"
 import apiClient from '../../API';
+import config from '../../Config';
 
 interface ProfileChatAreaProps {
     selectedProfile: {
@@ -43,8 +44,8 @@ export const ProfileChatArea: React.FC<ProfileChatAreaProps> = ({ selectedProfil
         if (!roomName) return;
 
         try {
-           const response = await fetch('https://app.vysyamala.com/auth/GetMessages/', {
-              //  const response = await fetch('http://103.214.132.20:8000/auth/GetMessages/', {
+            const response = await fetch(`${config.apiUrl}/auth/GetMessages/`, {
+                //  const response = await fetch('http://103.214.132.20:8000/auth/GetMessages/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -160,7 +161,7 @@ export const ProfileChatArea: React.FC<ProfileChatAreaProps> = ({ selectedProfil
                     setNewMessage('');
 
                     // // Call the first API
-                    
+
 
                     // Create a FormData object
                     const formData = new FormData();
@@ -182,7 +183,7 @@ export const ProfileChatArea: React.FC<ProfileChatAreaProps> = ({ selectedProfil
                     // Call the second API
                     const userChatListResponse = await apiClient.post(
                         '/auth/Get_user_chatlist/',
-                        { profile_id: profile_id  }
+                        { profile_id: profile_id }
                     );
 
                     console.log('User Chat List:', userChatListResponse.data);
@@ -249,7 +250,7 @@ export const ProfileChatArea: React.FC<ProfileChatAreaProps> = ({ selectedProfil
 
 
             {/* Chat Area */}
-           
+
             <div className="h-[35rem] overflow-y-auto px-5 py-3 message-box">
                 {messages.length > 0 ? (
                     messages.map((msg, index) => {
@@ -275,7 +276,7 @@ export const ProfileChatArea: React.FC<ProfileChatAreaProps> = ({ selectedProfil
                                 {showDate && (
                                     <div className="text-center ">
                                         <p className="text-[10px] text-center my-3 text-gray-500 p-1 bg-gray inline-block rounded-md">
-                                        {currentDate}
+                                            {currentDate}
                                         </p>
                                     </div>
                                 )}
@@ -285,13 +286,13 @@ export const ProfileChatArea: React.FC<ProfileChatAreaProps> = ({ selectedProfil
                                 >
                                     <div
                                         className={`rounded-[15px] px-4 py-2 mb-4 ${msg.username === username
-                                                ? "bg-chatBlue text-white"
-                                                : "bg-chatGray text-black"
+                                            ? "bg-chatBlue text-white"
+                                            : "bg-chatGray text-black"
                                             }`}
                                     >
                                         <p className="mb-1">{msg.message}</p>
                                         <div className={`text-[10px]  ${msg.username === username ? "text-end" : "text-start"
-                                        }`}>
+                                            }`}>
                                             {new Date(msg.date).toLocaleTimeString("en-IN", {
                                                 hour: "2-digit",
                                                 minute: "2-digit",
@@ -302,15 +303,15 @@ export const ProfileChatArea: React.FC<ProfileChatAreaProps> = ({ selectedProfil
                                         </div>
                                         <div
                                             className={`absolute z-[-1] ${msg.username === username
-                                                    ? "-right-[4px] bottom-[16px]"
-                                                    : "-left-[4px] bottom-[16px]"
+                                                ? "-right-[4px] bottom-[16px]"
+                                                : "-left-[4px] bottom-[16px]"
                                                 }`}
                                         >
                                             <img
                                                 className="w-full"
                                                 src={`${msg.username === username
-                                                        ? SenderMessageTail
-                                                        : ReceiverMessageTail
+                                                    ? SenderMessageTail
+                                                    : ReceiverMessageTail
                                                     }`}
                                                 alt=""
                                             />

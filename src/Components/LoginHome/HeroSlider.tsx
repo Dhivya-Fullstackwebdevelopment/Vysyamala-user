@@ -5,6 +5,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { HeroSliderContent } from "../LoginHome/HeroSlider/HeroSliderContent";
 import "./HeroSlider/HeroSlickStyle.css";
+import config from "../../Config";
 
 export const HeroSlider = () => {
   const [profileCount, setProfileCount] = useState<number>(0); // State to track the profile count
@@ -14,7 +15,7 @@ export const HeroSlider = () => {
     const fetchProfileCount = async () => {
       try {
         const response = await fetch(
-           "https://app.vysyamala.com/auth/Get_profile_intrests_list/",
+           `${config.apiUrl}/auth/Get_profile_intrests_list/`,
           //"http://103.214.132.20:8000/auth/Get_profile_intrests_list/",
           {
             method: "POST",

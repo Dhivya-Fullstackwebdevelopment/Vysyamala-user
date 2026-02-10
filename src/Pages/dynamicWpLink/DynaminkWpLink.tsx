@@ -121,6 +121,7 @@
 import { Helmet } from "react-helmet";
 // import { HeroSection } from "../../Components/HomePage/HeroSection";
 import { useSearchParams } from "react-router-dom";
+import config from "../../Config";
 
 const ImagePage: React.FC = () => {
     // Extract search parameters
@@ -154,10 +155,10 @@ const ImagePage: React.FC = () => {
                 />
                 <meta
                   property="og:image"
-                   content={ 'https://app.vysyamala.com/media/default_groom.png'} // Use placeholder if no image
+                   content={ `${config.apiUrl}/media/default_groom.png`} // Use placeholder if no image
                 //content={ 'http://103.214.132.20:8000/media/default_groom.png'} // Use placeholder if no image
                 />
-                <meta property="og:url" content={'https://app.vysyamala.com/media/default_groom.png'} />
+                <meta property="og:url" content={`${config.apiUrl}/media/default_groom.png`} />
                 {/* <meta property="og:url" content={'http://103.214.132.20:8000/media/default_groom.png'} /> */}
               </Helmet>
             {/* Hero Section */}
@@ -175,7 +176,7 @@ const ImagePage: React.FC = () => {
                 <div className="w-full">
                     <div className="flex justify-start mb-6">
                         <img
-                             src={profileImagess || "https://app.vysyamala.com/media/default_groom.png"}
+                             src={profileImagess || `${config.apiUrl}/media/default_groom.png`}
                            // src={profileImagess || "http://103.214.132.20:8000/media/default_groom.png"}
                             alt={profileName || "Name not available"}
                             className="w-48 h-48 sm:w-[40%] sm:h-[40%] object-cover rounded-3xl border-4 border-orange-400 shadow-redboxshadow hover:scale-105 transition-transform duration-300"

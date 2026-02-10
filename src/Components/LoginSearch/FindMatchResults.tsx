@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { ProfileContext } from "../../ProfileContext";
 import { Get_advance_search } from "../../commonapicall";
 import { SearchResults } from "../../Components/LoginSearch/SearchResults"; // Re-use your SearchResults component
 import { Hearts } from "react-loader-spinner";
+import apiClient from "../../API";
 
 const FindMatch = () => {
     const context = useContext(ProfileContext);
@@ -52,7 +52,7 @@ const FindMatch = () => {
         const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
 
         try {
-            const response = await axios.post(Get_advance_search, {
+            const response = await apiClient.post(Get_advance_search, {
                 profile_id: loginuser_profileId,
                 from_age: fromAge,
                 to_age: ToAge,

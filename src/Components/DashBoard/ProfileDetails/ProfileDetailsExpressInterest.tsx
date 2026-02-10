@@ -27,6 +27,7 @@ import { Hearts } from 'react-loader-spinner'
 import { ReUseUpGradePopup } from "../ReUsePopup/ReUseUpGradePopup";
 import { GenderRestrictionPopup } from "../ReUsePopup/GenderRestrictionPopup";
 import { decryptId } from "../../../utils/cryptoUtils";
+import config from "../../../Config";
 
 // Define the interfaces for profile data
 interface HoroscopeDetails {
@@ -593,8 +594,8 @@ export const ProfileDetailsExpressInterest: React.FC<
 
   const generatePoruthamPDF = async () => {
     try {
-      const response = await axios.get(
-        `https://app.vysyamala.com/auth/generate-porutham-pdf-mobile/${loginuser_profileId}/${idparam}/`,
+      const response = await apiClient.get(
+        `/auth/generate-porutham-pdf-mobile/${loginuser_profileId}/${idparam}/`,
         // const response = await apiClient.get(
         //   `/auth/generate-porutham-pdf-mobile/${loginuser_profileId}/${idparam}/`,
         {
@@ -732,8 +733,8 @@ export const ProfileDetailsExpressInterest: React.FC<
   const handleDownloadPdf = () => {
     const link = document.createElement("a");
     link.target = '_blank'; // Open in a new tab
-    // link.href = `https://app.vysyamala.com/auth/generate-pdf/${loginuser_profileId}/${idparam}`;
-    link.href = `https://app.vysyamala.com/auth/New_horoscope_black/${idparam}/${loginuser_profileId}/`;
+    // link.href = `${config.apiUrl}/auth/generate-pdf/${loginuser_profileId}/${idparam}`;
+    link.href = `${config.apiUrl}/auth/New_horoscope_black/${idparam}/${loginuser_profileId}/`;
     // link.href = `http://103.214.132.20:8000/auth/generate-pdf/${loginuser_profileId}/${idparam}`;
     link.download = `pdf_${idparam}.pdf`; // Customize the file name
     link.click();
@@ -741,8 +742,8 @@ export const ProfileDetailsExpressInterest: React.FC<
   const handleDownloadColorPdf = () => {
     const link = document.createElement("a");
     link.target = '_blank'; // Open in a new tab
-    // link.href = `https://app.vysyamala.com/auth/generate-pdf/${loginuser_profileId}/${idparam}`;
-    link.href = `https://app.vysyamala.com/auth/New_horoscope_color/${idparam}/${loginuser_profileId}/`;
+    // link.href = `${config.apiUrl}/auth/generate-pdf/${loginuser_profileId}/${idparam}`;
+    link.href = `${config.apiUrl}/auth/New_horoscope_color/${idparam}/${loginuser_profileId}/`;
     // link.href = `http://103.214.132.20:8000/auth/generate-pdf/${loginuser_profileId}/${idparam}`;
     link.download = `pdf_${idparam}.pdf`; // Customize the file name
     link.click();
@@ -1091,7 +1092,7 @@ export const ProfileDetailsExpressInterest: React.FC<
                       </h5>
                     )}
 
-                    
+
                     {/* Star & Gothram */}
                     <div className="flex justify-start gap-4 items-center mb-3 max-lg:flex-wrap max-sm:gap-3 max-sm:flex-col max-sm:items-start">
                       {profileData?.horoscope_details?.star_name &&
