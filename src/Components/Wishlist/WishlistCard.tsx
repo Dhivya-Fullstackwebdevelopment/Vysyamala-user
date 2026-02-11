@@ -22,8 +22,6 @@ import { Hearts } from "react-loader-spinner";
 import { encryptId } from "../../utils/cryptoUtils";
 import PlatinumModal from "../DashBoard/ReUsePopup/PlatinumModalPopup";
 
-
-// Define the shape of your wishlist profile
 interface WishlistProfile {
   height: string;
   degree: string;
@@ -45,6 +43,8 @@ interface WishlistProfile {
   wishlist_userstatus: string;
   wishlist_horoscope: string;
   wishlist_profile: number;
+  wishlist_marriage_check?: boolean;
+  wishlist_marriage_badge?: string;
 }
 interface WishlistCardProps {
   page: number;
@@ -135,7 +135,10 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
   // const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
 
-  const handleProfileClick = async (profileId: string) => {
+  const handleProfileClick = async (profileId: string, isMarriageChecked?: boolean) => {
+    if (isMarriageChecked) {
+      return;
+    }
     if (isPlatinumModalOpen) return;
     if (activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
@@ -296,7 +299,12 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
             {wishlistProfiles.map((profile) => (
               <div
                 key={profile.wishlist_profileid}
-                className="flex justify-start items-center space-x-5 relative rounded-xl shadow-profileCardShadow px-3 py-3 mb-5"
+                onClick={() =>
+                  !profile.wishlist_marriage_check &&
+                  handleProfileClick(profile.wishlist_profileid, profile.wishlist_marriage_check)
+                }
+                className={`flex justify-start items-center space-x-5 relative rounded-xl shadow-profileCardShadow px-3 py-3 mb-5
+  ${profile.wishlist_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}
               >
                 {activeProfileId === profile.wishlist_profileid && (
                   <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white bg-opacity-70 rounded-xl">
@@ -312,11 +320,21 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
                         src={profile.wishlist_Profile_img || defaultImgUrl}
                         alt="Profile-image"
                         onError={(e) => {
-                          e.currentTarget.onerror = null; // Prevent infinite loop
-                          e.currentTarget.src = defaultImgUrl; // Set default image
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = defaultImgUrl;
                         }}
                         className="rounded-[6px] w-[218px] h-[218px]  max-md:w-full"
                       />
+                      {profile.wishlist_marriage_check && (
+                        <div className="absolute inset-0 rounded-[6px] backdrop-blur-sm bg-black/30 flex items-center justify-center">
+                          <img
+                            src={profile.wishlist_marriage_badge}
+                            alt="Marriage Badge"
+                            className="w-[90px] h-[90px] object-contain rounded-full bg-[#F8EFE0] p-2 shadow-xl"
+                          />
+                        </div>
+                      )}
+
                       {bookmarkedProfiles.includes(profile.wishlist_profileid) ? (
                         <MdBookmark
                           onClick={(e) => {
@@ -345,9 +363,11 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
                         <div className="flex items-center">
                           <h5
                             onClick={() =>
-                              handleProfileClick(profile.wishlist_profileid)
+                              handleProfileClick(profile.wishlist_profileid, profile.wishlist_marriage_check)
                             }
-                            className="text-[20px] text-secondary font-semibold cursor-pointer"
+                            className={`text-[20px] text-secondary font-semibold
+${profile.wishlist_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}
+
                           >
                             {profile.wishlist_profile_name}
                             <span className="text-sm text-ashSecondary">

@@ -44,6 +44,8 @@ interface Profile {
   viwed_userstatus: string;
   viwed_horoscope: string;
   viwed_profile_wishlist?: number;
+  visited_marriage_check?: boolean;
+  visited_marriage_badge?: string | null;
 }
 
 interface ApiResponse {
@@ -181,7 +183,10 @@ export const MyVisitorsCard: React.FC<VisitorsProfilesCardProps> = ({ pageNumber
   //   navigate(`/ProfileDetails?id=${profileId}&page=5`);
   // };
 
-  const handleProfileClick = async (profileId: string) => {
+  const handleProfileClick = async (profileId: string, isMarriageChecked?: boolean) => {
+    if (isMarriageChecked) {
+      return;
+    }
     if (isPlatinumModalOpen) return; if (isPlatinumModalOpen) return;
     if (activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
@@ -281,32 +286,34 @@ export const MyVisitorsCard: React.FC<VisitorsProfilesCardProps> = ({ pageNumber
               <p className="mt-2 text-sm text-primary">Please wait...</p>
             </div>
           )}
-          <div className="flex justify-start items-center space-x-5 relative rounded-xl shadow-sm py-5">
+          <div className={`flex justify-start items-center space-x-5 relative rounded-xl shadow-sm py-5
+                         ${profile.visited_marriage_check ? "cursor-not-allowed" : ""}`}>
             <div className="w-full flex justify-between items-center">
               <div className="flex justify-between items-start space-x-5  max-sm:flex-col max-sm:gap-5 max-sm:w-full max-sm:items-start">
                 {/* Profile Image */}
-                <div className="relative  max-sm:w-full">
+                <div className="relative  max-sm:w-full"
+                  onClick={() =>
+                    !profile.visited_marriage_check &&
+                    handleProfileClick(profile.viwed_profileid, profile.visited_marriage_check)
+                  }>
                   <img
                     src={profile.viwed_Profile_img || defaultImgUrl}
                     alt="Profile-image"
                     onError={(e) => {
-                      e.currentTarget.onerror = null; // Prevent infinite loop
-                      e.currentTarget.src = defaultImgUrl; // Set default image
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = defaultImgUrl;
                     }}
                     className="rounded-[6px] w-[218px] h-[218px]  max-md:w-full"
                   />
-
-                  {/* {bookmarkedProfiles[profile.viwed_profileid] ? (
-                    <MdBookmark
-                      onClick={() => handleBookmark(profile.viwed_profileid)}
-                      className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
-                    />
-                  ) : (
-                    <MdBookmarkBorder
-                      onClick={() => handleBookmark(profile.viwed_profileid)}
-                      className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
-                    />
-                  )} */}
+                  {profile.visited_marriage_check && (
+                    <div className="absolute inset-0 rounded-[6px] backdrop-blur-sm bg-black/30 flex items-center justify-center">
+                      <img
+                        src={profile.visited_marriage_badge || ""}
+                        alt="Marriage Badge"
+                        className="w-[90px] h-[90px] object-contain rounded-full bg-[#F8EFE0] p-2 shadow-xl"
+                      />
+                    </div>
+                  )}
                   {bookmarkedProfiles.includes(profile.viwed_profileid) ? (
                     <MdBookmark
                       onClick={(e) => {
@@ -331,8 +338,12 @@ export const MyVisitorsCard: React.FC<VisitorsProfilesCardProps> = ({ pageNumber
                   {/* Name & Profile ID */}
                   <div className="relative mb-2">
                     <h5
-                      className="text-[20px] text-secondary font-semibold flex items-center gap-2 cursor-pointer"
-                      onClick={() => handleProfileClick(profile.viwed_profileid)}
+                      className={`text-[20px] text-secondary font-semibold flex items-center gap-2
+                      ${profile.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}
+                      onClick={() =>
+                        !profile.visited_marriage_check &&
+                        handleProfileClick(profile.viwed_profileid, profile.visited_marriage_check)
+                      }
                     >
                       {profile.viwed_profile_name}
                       <span className="text-sm text-ashSecondary">

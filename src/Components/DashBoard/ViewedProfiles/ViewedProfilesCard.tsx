@@ -40,6 +40,9 @@ interface Profile {
   visited_horoscope: string;
   visited_profile_wishlist: number;
   visited_datetime: string;
+  visited_marriage_check?: boolean;
+  visited_marriage_badge?: string | null;
+
 }
 
 interface ApiResponse {
@@ -171,7 +174,10 @@ export const ViewedProfilesCard: React.FC<ViewedProfilesCardProps> = ({ pageNumb
   // };
 
 
-  const handleProfileClick = async (profileId: string) => {
+  const handleProfileClick = async (profileId: string, isMarriageChecked?: boolean) => {
+    if (isMarriageChecked) {
+      return;
+    }
     if (isPlatinumModalOpen) return;
     if (activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
@@ -265,7 +271,8 @@ export const ViewedProfilesCard: React.FC<ViewedProfilesCardProps> = ({ pageNumb
       {profiles.map((profile) => (
         <div
           key={profile.visited_profileid}
-          className="flex justify-start items-center space-x-5 relative  py-5  border-b-[1px] border-ashSecondary rounded-none"
+          className={`flex justify-start items-center space-x-5 relative py-5 border-b-[1px] border-ashSecondary rounded-none
+  ${profile.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}
         >
           {activeProfileId === profile.visited_profileid && (
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white bg-opacity-70 rounded-xl">
@@ -276,7 +283,11 @@ export const ViewedProfilesCard: React.FC<ViewedProfilesCardProps> = ({ pageNumb
           <div className="w-full flex justify-between items-center">
             <div className="flex justify-between items-start space-x-5  max-sm:flex-col max-sm:gap-5 max-sm:w-full max-sm:items-start">
               {/* Profile Image */}
-              <div className="relative  max-sm:w-full cursor-pointer" onClick={() => handleProfileClick(profile.visited_profileid)}>
+              <div className="relative  max-sm:w-full cursor-pointer"
+                onClick={() =>
+                  !profile.visited_marriage_check &&
+                  handleProfileClick(profile.visited_profileid)
+                }>
                 <img
                   src={profile.visited_Profile_img || defaultImgUrl}
                   alt="Profile-image"
@@ -286,6 +297,15 @@ export const ViewedProfilesCard: React.FC<ViewedProfilesCardProps> = ({ pageNumb
                   }}
                   className="rounded-[6px] w-[218px] h-[218px]  max-md:w-full"
                 />
+                {profile.visited_marriage_check && (
+                  <div className="absolute inset-0 rounded-[6px] backdrop-blur-sm bg-black/30 flex items-center justify-center">
+                    <img
+                      src={profile.visited_marriage_badge || ""}
+                      alt="Marriage Badge"
+                      className="w-[90px] h-[90px] object-contain rounded-full bg-[#F8EFE0] p-2 shadow-xl"
+                    />
+                  </div>
+                )}
 
                 {bookmarkedProfiles.includes(profile.visited_profileid) ? (
                   <MdBookmark
@@ -312,9 +332,10 @@ export const ViewedProfilesCard: React.FC<ViewedProfilesCardProps> = ({ pageNumb
                 <div className="relative mb-2">
                   <div className="flex items-center">
                     <h5
-                      className="text-[20px] text-secondary font-semibold cursor-pointer"
+                      className={`text-[20px] text-secondary font-semibold
+                      ${profile.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}
                       onClick={() =>
-                        handleProfileClick(profile.visited_profileid)
+                        handleProfileClick(profile.visited_profileid, profile.visited_marriage_check)
                       }
                     >
                       {profile.visited_profile_name}
