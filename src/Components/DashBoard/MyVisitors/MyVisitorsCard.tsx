@@ -278,7 +278,7 @@ export const MyVisitorsCard: React.FC<VisitorsProfilesCardProps> = ({ pageNumber
       {profiles.map((profile) => (
         <div
           key={profile.viwed_profileid}
-          className="border-b-[1px] border-footer-text-gray mb-4"
+          className="relative border-b-[1px] border-footer-text-gray mb-4"
         >
           {activeProfileId === profile.viwed_profileid && (
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white bg-opacity-70 rounded-xl">

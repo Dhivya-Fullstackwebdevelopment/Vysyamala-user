@@ -416,7 +416,7 @@ const PhotoRequestCard = ({
 
       <div
         key={data.req_profileid}
-        className=""
+        className="relative border-b-[1px] border-footer-text-gray mb-4"
       >
         {activeProfileId === data.req_profileid && (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white bg-opacity-70 rounded-xl">
