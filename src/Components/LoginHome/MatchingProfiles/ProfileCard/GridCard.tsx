@@ -12,6 +12,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Hearts } from "react-loader-spinner";
 import { encryptId } from "../../../../utils/cryptoUtils";
 import PlatinumModal from "../../../DashBoard/ReUsePopup/PlatinumModalPopup";
+import FreeProfileRestrictionPopup from "../../../DashBoard/ReUsePopup/FreeProfileRestrictionPopup";
+import PremiumProfileRestrictionPopup from "../../../DashBoard/ReUsePopup/PremiumProfileRestrictionPopup";
 
 // import { toast } from "react-toastify";
 
@@ -31,7 +33,8 @@ export const GridCard: React.FC<GridCardProps> = ({ profile }) => {
     setSelectedProfiles: () => { },
   };
   const [isPlatinumModalOpen, setIsPlatinumModalOpen] = useState(false);
-
+  const [isFreeLimitPopupOpen, setIsFreeLimitPopupOpen] = useState(false);
+  const [isPremiumLimitPopupOpen, setIsPremiumLimitPopupOpen] = useState(false);
   // useEffect(() => {
   //   const bookmarkedProfiles = JSON.parse(
   //     localStorage.getItem("bookmarkedProfiles") || "[]"
@@ -90,10 +93,9 @@ export const GridCard: React.FC<GridCardProps> = ({ profile }) => {
 
   // Updated handleCardClick in GridCard component
   const handleCardClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (isPlatinumModalOpen) return;
-    if (isLoading) return;
-    setIsLoading(true);
     e.stopPropagation();
+    if (isPremiumLimitPopupOpen || isPlatinumModalOpen || isFreeLimitPopupOpen || isLoading) return;
+    setIsLoading(true);
 
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
 
@@ -117,12 +119,37 @@ export const GridCard: React.FC<GridCardProps> = ({ profile }) => {
       //   return;
       // }
 
+      // if (checkResponse.data.status === "failure") {
+      //   if (checkResponse.data.message === "Profile visibility restricted") {
+      //     setIsPlatinumModalOpen(true);
+      //   } else {
+      //     toast.error(checkResponse.data.message || "Limit reached to view profile");
+      //   }
+      //   return;
+      // }
+
       if (checkResponse.data.status === "failure") {
-        if (checkResponse.data.message === "Profile visibility restricted") {
-          setIsPlatinumModalOpen(true);
-        } else {
-          toast.error(checkResponse.data.message || "Limit reached to view profile");
+        const message = checkResponse.data.message;
+
+        if (
+          message ===
+          "Today’s view limit has been reached.Please log in tomorrow to view more new profiles.You can still revisit profiles you’ve already viewed."
+        ) {
+          setIsPremiumLimitPopupOpen(true);
+          return;
         }
+
+        if (message === "You have reached your profile viewing limit.") {
+          setIsFreeLimitPopupOpen(true);
+          return;
+        }
+
+        if (message === "Profile visibility restricted") {
+          setIsPlatinumModalOpen(true);
+          return;
+        }
+
+        toast.error(message || "Error accessing profile.");
         return;
       }
 
@@ -157,8 +184,11 @@ export const GridCard: React.FC<GridCardProps> = ({ profile }) => {
 
       if (serverMessage === "Profile visibility restricted") {
         setIsPlatinumModalOpen(true);
-      } else {
-        // Only show the toast if it's NOT the visibility restriction
+      } else if (serverMessage === "You have reached your profile viewing limit.") {
+        setIsFreeLimitPopupOpen(true);
+      } else if (serverMessage?.includes("Today’s view limit has been reached")) {
+        setIsPremiumLimitPopupOpen(true);
+      }else {
         toast.error(serverMessage || "Error accessing profile.");
         console.error("API Error:", error);
       }
@@ -286,6 +316,14 @@ export const GridCard: React.FC<GridCardProps> = ({ profile }) => {
       <PlatinumModal
         isOpen={isPlatinumModalOpen}
         onClose={() => setIsPlatinumModalOpen(false)}
+      />
+      <FreeProfileRestrictionPopup
+        isOpen={isFreeLimitPopupOpen}
+        onClose={() => setIsFreeLimitPopupOpen(false)}
+      />
+      <PremiumProfileRestrictionPopup
+        isOpen={isPremiumLimitPopupOpen}
+        onClose={() => setIsPremiumLimitPopupOpen(false)}
       />
     </div>
   );

@@ -21,6 +21,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Hearts } from "react-loader-spinner";
 import { encryptId } from "../../utils/cryptoUtils";
 import PlatinumModal from "../DashBoard/ReUsePopup/PlatinumModalPopup";
+import FreeProfileRestrictionPopup from "../DashBoard/ReUsePopup/FreeProfileRestrictionPopup";
+import PremiumProfileRestrictionPopup from "../DashBoard/ReUsePopup/PremiumProfileRestrictionPopup";
 
 interface WishlistProfile {
   height: string;
@@ -65,6 +67,8 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
   const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
   const [bookmarkedProfiles, setBookmarkedProfiles] = useState<string[]>([]);
   const [isPlatinumModalOpen, setIsPlatinumModalOpen] = useState(false);
+  const [isFreeLimitPopupOpen, setIsFreeLimitPopupOpen] = useState(false);
+  const [isPremiumLimitPopupOpen, setIsPremiumLimitPopupOpen] = useState(false);
 
   const fetchWishlistProfiles = async (profileId: string) => {
     setIsLoading(true); // Start loading
@@ -139,8 +143,7 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
     if (isMarriageChecked) {
       return;
     }
-    if (isPlatinumModalOpen) return;
-    if (activeProfileId) return;
+    if (isPremiumLimitPopupOpen || isFreeLimitPopupOpen || isPlatinumModalOpen || activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
     const secureId = encryptId(profileId);
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
@@ -156,7 +159,7 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
         {
           profile_id: loginuser_profileId,
           user_profile_id: profileId,
-          page_id: page_id,
+        page_id: page_id,
         }
       );
 
@@ -166,12 +169,37 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
       //   return;
       // }
 
+      // if (checkResponse.data.status === "failure") {
+      //   if (checkResponse.data.message === "Profile visibility restricted") {
+      //     setIsPlatinumModalOpen(true);
+      //   } else {
+      //     toast.error(checkResponse.data.message || "Limit reached to view profile");
+      //   }
+      //   return;
+      // }
+
       if (checkResponse.data.status === "failure") {
-        if (checkResponse.data.message === "Profile visibility restricted") {
-          setIsPlatinumModalOpen(true);
-        } else {
-          toast.error(checkResponse.data.message || "Limit reached to view profile");
+        const message: string = checkResponse.data.message || "";
+
+        if (
+          message ===
+          "Today’s view limit has been reached.Please log in tomorrow to view more new profiles.You can still revisit profiles you’ve already viewed."
+        ) {
+          setIsPremiumLimitPopupOpen(true);
+          return;
         }
+
+        if (message === "You have reached your profile viewing limit.") {
+          setIsFreeLimitPopupOpen(true);
+          return;
+        }
+
+        if (message.includes("Profile visibility restricted")) {
+          setIsPlatinumModalOpen(true);
+          return;
+        }
+
+        toast.error(message || "Error Accessing Profile");
         return;
       }
 
@@ -192,6 +220,10 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
 
       if (serverMessage === "Profile visibility restricted") {
         setIsPlatinumModalOpen(true);
+      } else if (serverMessage === "You have reached your profile viewing limit.") {
+        setIsFreeLimitPopupOpen(true);
+      } else if (serverMessage?.includes("Today’s view limit has been reached")) {
+        setIsPremiumLimitPopupOpen(true);
       } else {
         // Only show the toast if it's NOT the visibility restriction
         toast.error(serverMessage || "Error accessing profile.");
@@ -482,6 +514,14 @@ ${profile.wishlist_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}
       <PlatinumModal
         isOpen={isPlatinumModalOpen}
         onClose={() => setIsPlatinumModalOpen(false)}
+      />
+      <FreeProfileRestrictionPopup
+        isOpen={isFreeLimitPopupOpen}
+        onClose={() => setIsFreeLimitPopupOpen(false)}
+      />
+      <PremiumProfileRestrictionPopup
+        isOpen={isPremiumLimitPopupOpen}
+        onClose={() => setIsPremiumLimitPopupOpen(false)}
       />
     </div>
   );

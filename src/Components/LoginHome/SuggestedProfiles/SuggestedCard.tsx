@@ -95,6 +95,8 @@ import apiClient from "../../../API";
 import { Hearts } from "react-loader-spinner";
 import { encryptId } from "../../../utils/cryptoUtils";
 import PlatinumModal from "../../DashBoard/ReUsePopup/PlatinumModalPopup";
+import PremiumProfileRestrictionPopup from "../../DashBoard/ReUsePopup/PremiumProfileRestrictionPopup";
+import FreeProfileRestrictionPopup from "../../DashBoard/ReUsePopup/FreeProfileRestrictionPopup";
 
 interface SuggestedCardProps {
   profileImg?: string;
@@ -124,6 +126,8 @@ export const SuggestedCard: React.FC<SuggestedCardProps> = ({
   // State to track if the card is bookmarked or not
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isPlatinumModalOpen, setIsPlatinumModalOpen] = useState(false);
+  const [isFreeLimitPopupOpen, setIsFreeLimitPopupOpen] = useState(false);
+  const [isPremiumLimitPopupOpen, setIsPremiumLimitPopupOpen] = useState(false);
 
   const handleBookmark = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -135,8 +139,7 @@ export const SuggestedCard: React.FC<SuggestedCardProps> = ({
 
 
   const handleProfileClick = async (profileId: string) => {
-    if (isPlatinumModalOpen) return;
-    if (activeProfileId) return;
+    if (isPremiumLimitPopupOpen || isFreeLimitPopupOpen || isPlatinumModalOpen || activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
     const secureId = encryptId(profileId);
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
@@ -158,12 +161,37 @@ export const SuggestedCard: React.FC<SuggestedCardProps> = ({
       //   return;
       // }
 
+      // if (checkResponse.data.status === "failure") {
+      //   if (checkResponse.data.message === "Profile visibility restricted") {
+      //     setIsPlatinumModalOpen(true);
+      //   } else {
+      //     toast.error(checkResponse.data.message || "Limit reached to view profile");
+      //   }
+      //   return;
+      // }
+
       if (checkResponse.data.status === "failure") {
-        if (checkResponse.data.message === "Profile visibility restricted") {
-          setIsPlatinumModalOpen(true);
-        } else {
-          toast.error(checkResponse.data.message || "Limit reached to view profile");
+        const message: string = checkResponse.data.message || "";
+
+        if (
+          message ===
+          "Today’s view limit has been reached.Please log in tomorrow to view more new profiles.You can still revisit profiles you’ve already viewed."
+        ) {
+          setIsPremiumLimitPopupOpen(true);
+          return;
         }
+
+        if (message === "You have reached your profile viewing limit.") {
+          setIsFreeLimitPopupOpen(true);
+          return;
+        }
+
+        if (message.includes("Profile visibility restricted")) {
+          setIsPlatinumModalOpen(true);
+          return;
+        }
+
+        toast.error(message || "Error Accessing Profile");
         return;
       }
 
@@ -176,6 +204,10 @@ export const SuggestedCard: React.FC<SuggestedCardProps> = ({
 
       if (serverMessage === "Profile visibility restricted") {
         setIsPlatinumModalOpen(true);
+      } else if (serverMessage === "You have reached your profile viewing limit.") {
+        setIsFreeLimitPopupOpen(true);
+      } else if (serverMessage?.includes("Today’s view limit has been reached")) {
+        setIsPremiumLimitPopupOpen(true);
       } else {
         // Only show the toast if it's NOT the visibility restriction
         toast.error(serverMessage || "Error accessing profile.");
@@ -254,6 +286,14 @@ export const SuggestedCard: React.FC<SuggestedCardProps> = ({
       <PlatinumModal
         isOpen={isPlatinumModalOpen}
         onClose={() => setIsPlatinumModalOpen(false)}
+      />
+      <FreeProfileRestrictionPopup
+        isOpen={isFreeLimitPopupOpen}
+        onClose={() => setIsFreeLimitPopupOpen(false)}
+      />
+      <PremiumProfileRestrictionPopup
+        isOpen={isPremiumLimitPopupOpen}
+        onClose={() => setIsPremiumLimitPopupOpen(false)}
       />
     </div>
   );
