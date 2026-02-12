@@ -46,10 +46,12 @@ const profileIdSchema = z.object({
 const advancedSearchSchema = z.object({
   fromAge: z.coerce.number().min(18, "Minimum age is 18").optional().or(z.literal("")),
   toAge: z.coerce.number().optional().or(z.literal("")),
+  fromHeight: z.coerce.number().optional().or(z.literal("")),
+  toHeight: z.coerce.number().optional().or(z.literal("")),
 }).superRefine((data, ctx) => {
   const myGender = localStorage.getItem("gender")?.toLowerCase();
   const myAge = Number(localStorage.getItem("age")) || 0;
-
+  const myHeight = Number(localStorage.getItem("height")) || 0;
   // Validation: Males cannot search for someone > (My Age + 1)
   if (myGender === "male" && data.toAge && Number(data.toAge) > (myAge + 1)) {
     ctx.addIssue({
@@ -74,6 +76,32 @@ const advancedSearchSchema = z.object({
       code: z.ZodIssueCode.custom,
       message: "From Age cannot be greater than To Age",
       path: ["fromAge"],
+    });
+  }
+  /** --- New Height Logic --- **/
+  // Validation: Males cannot search for someone > (My Height + 2)
+  if (myGender === "male" && data.toHeight && Number(data.toHeight) > (myHeight + 2)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Your height preference does not match this profile.",
+      path: ["toHeight"],
+    });
+  }
+
+  // Validation: Females cannot search for someone < (My Height - 2)
+  if (myGender === "female" && data.fromHeight && Number(data.fromHeight) < (myHeight - 2)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Your height preference does not match this profile.",
+      path: ["fromHeight"],
+    });
+  }
+
+  if (data.fromHeight && data.toHeight && Number(data.fromHeight) > Number(data.toHeight)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "From Height cannot be greater than To Height",
+      path: ["fromHeight"],
     });
   }
 });
@@ -694,6 +722,7 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
                     <input
                       type="text"
                       id="fromHeight"
+                      {...advancedForm.register("fromHeight")}
                       value={fromHeight}
                       onKeyDown={(e) => {
                         const allowedKeys = [
@@ -725,11 +754,14 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
                       onChange={(e) => {
                         const value = e.target.value; // Allow only digits
                         setFromHeight(Number(value)); // Update context state, default to 0 if empty
+                        advancedForm.setValue("fromHeight", value as any, { shouldValidate: true });
                       }}
                       placeholder="From"
                       className="outline-none w-full px-3 py-[13px] text-placeHolderColor border border-footer-text-gray rounded"
                     />
-
+                    {advancedForm.formState.errors.fromHeight && (
+                      <p className="text-red-500 text-xs mt-1">{advancedForm.formState.errors.fromHeight.message}</p>
+                    )}
                   </div>
 
                   <div className="w-full">
@@ -763,15 +795,19 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
 
                       type="text"
                       id="toHeight"
+                      {...advancedForm.register("toHeight")}
                       value={toHeight}
                       onChange={(e) => {
                         const value = e.target.value; // Allow only digits
                         setToHeight(Number(value)); // Update context state, default to 0 if empty
+                        advancedForm.setValue("toHeight", value as any, { shouldValidate: true });
                       }}
                       placeholder="To"
                       className="outline-none w-full px-3 py-[13px] text-placeHolderColor border border-footer-text-gray rounded"
                     />
-
+                    {advancedForm.formState.errors.toHeight && (
+                      <p className="text-red-500 text-xs mt-1">{advancedForm.formState.errors.toHeight.message}</p>
+                    )}
                   </div>
 
                 </div>
