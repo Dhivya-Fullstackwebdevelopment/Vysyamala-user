@@ -119,6 +119,7 @@ export const ProfileDetailsExpressInterest: React.FC<
   const storedPlanId = localStorage.getItem("plan_id") || sessionStorage.getItem("plan_id");
   const isPlan16 = storedPlanId === "16";
   const [serverEncryptedId, setServerEncryptedId] = useState<string>("");
+  const [EncryptedMyprofileId, setEncryptedMyprofileId] = useState<string>("");
 
   ////console.log("vysya", storedPlanId);
   const navigate = useNavigate();
@@ -329,6 +330,9 @@ export const ProfileDetailsExpressInterest: React.FC<
         }
         if (response.data.encrypted_profile_id) {
           setServerEncryptedId(response.data.encrypted_profile_id);
+        }
+        if (response.data.My_profile_id) {
+          setEncryptedMyprofileId(response.data.My_profile_id);
         }
         setVysAssistData(response.data);
 
@@ -596,9 +600,11 @@ export const ProfileDetailsExpressInterest: React.FC<
   };
 
   const generatePoruthamPDF = async () => {
+    const encodedId = encodeURIComponent(serverEncryptedId);
+    const encodedMyprofileId = encodeURIComponent(EncryptedMyprofileId);
     try {
       const response = await apiClient.get(
-        `/auth/generate-porutham-pdf-mobile/${loginuser_profileId}/${idparam}/`,
+        `/auth/generate-porutham-pdf-mobile/${encodedMyprofileId}/${encodedId}/`,
         // const response = await apiClient.get(
         //   `/auth/generate-porutham-pdf-mobile/${loginuser_profileId}/${idparam}/`,
         {
@@ -735,20 +741,22 @@ export const ProfileDetailsExpressInterest: React.FC<
   // Horoscope Download Function
   const handleDownloadPdf = () => {
     const encodedId = encodeURIComponent(serverEncryptedId);
+    const encodedMyprofileId = encodeURIComponent(EncryptedMyprofileId);
     const link = document.createElement("a");
     link.target = '_blank'; // Open in a new tab
     // link.href = `${config.apiUrl}/auth/generate-pdf/${loginuser_profileId}/${idparam}`;
-    link.href = `${config.apiUrl}/auth/New_horoscope_black/${encodedId}/${encodedId}/`;
+    link.href = `${config.apiUrl}/auth/New_horoscope_black/${encodedMyprofileId}/${encodedId}/`;
     // link.href = `http://103.214.132.20:8000/auth/generate-pdf/${loginuser_profileId}/${idparam}`;
     link.download = `pdf_${idparam}.pdf`; // Customize the file name
     link.click();
   };
   const handleDownloadColorPdf = () => {
     const encodedId = encodeURIComponent(serverEncryptedId);
+    const encodedMyprofileId = encodeURIComponent(EncryptedMyprofileId);
     const link = document.createElement("a");
     link.target = '_blank'; // Open in a new tab
     // link.href = `${config.apiUrl}/auth/generate-pdf/${loginuser_profileId}/${idparam}`;
-    link.href = `${config.apiUrl}/auth/New_horoscope_color/${encodedId}/${encodedId}/`;
+    link.href = `${config.apiUrl}/auth/New_horoscope_color/${encodedMyprofileId}/${encodedId}/`;
     // link.href = `http://103.214.132.20:8000/auth/generate-pdf/${loginuser_profileId}/${idparam}`;
     link.download = `pdf_${idparam}.pdf`; // Customize the file name
     link.click();
