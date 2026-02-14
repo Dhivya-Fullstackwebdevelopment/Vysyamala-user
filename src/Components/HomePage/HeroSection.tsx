@@ -28,6 +28,8 @@ const schema = z.object({
       /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/,
       "Password must contain at least one uppercase letter and one special character"
     ),
+  Profile_country: z.string().optional(),
+  Profile_state: z.string().optional(),
 });
 
 type ProfileOption = {
@@ -51,6 +53,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNext, onEditNumber }
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      Profile_country: "1", // Default India
+    },
   });
 
   const [profileOptions, setProfileOptions] = useState<ProfileOption[]>([]);
@@ -58,6 +63,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNext, onEditNumber }
   const [isSubmitting, setIsSubmitting] = useState(false); // New state for submission status
   // const [gender, setGender] = useState<string>("");
   const [mobile, setMobileNumber] = useState("");
+  const [countries] = useState([
+    { id: "1", name: "India" },
+    { id: "", name: "NRI" },
+  ]);
+
+  const [statesList, setStatesList] = useState<
+    { state_id: number; state_name: string }[]
+  >([]);
+
+  const [selectedCountry, setSelectedCountry] = useState("1"); // Default India
 
   // Fetch the profile options from the API
   useEffect(() => {
@@ -116,6 +131,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNext, onEditNumber }
       Mobile_no: data.mobile,
       EmailId: data.email.trim(),
       Password: data.password.trim(),
+      Profile_country: selectedCountry,
+      Profile_state: data.Profile_state || "",
     };
     sessionStorage.setItem("email", data.email);
     try {
@@ -197,6 +214,19 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNext, onEditNumber }
     }
   }, [controls, inView]);
 
+  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setSelectedCountry(value);
+    setValue("Profile_country", value);
+    setValue("Profile_state", "");
+
+    if (value === "1") {
+      fetchStates("1");
+    } else {
+      setStatesList([]);
+    }
+  };
+
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "//code.tidio.co/0ddzgwb7jku0kpejkcqvuplsouyvgqhw.js";
@@ -206,6 +236,30 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNext, onEditNumber }
     return () => {
       document.body.removeChild(script);
     };
+  }, []);
+
+  const fetchStates = async (countryId: string) => {
+    try {
+      const response = await apiClient.post(
+        `/auth/Get_State/`,
+        { country_id: countryId },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      const states = Object.values(response.data) as {
+        state_id: number;
+        state_name: string;
+      }[];
+
+      setStatesList(states);
+    } catch (error) {
+      console.error("Error fetching states:", error);
+      setStatesList([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchStates("1"); // Load India states by default
   }, []);
 
 
@@ -374,6 +428,37 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNext, onEditNumber }
                     <p className="text-red-500">{errors.password.message}</p>
                   )}
                 </div>
+
+                
+                <div className="w-full">
+                  <select
+                    className="w-full bg-transparent text-[16px] text-vysyamalaBlack font-normal py-[17px] px-[12px] border-[1px] border-[#282c3f80] rounded-[5px]"
+                    {...register("Profile_country")}
+                    value={selectedCountry}
+                    onChange={handleCountryChange}
+                  >
+                    {countries.map((country) => (
+                      <option key={country.id} value={country.id}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {selectedCountry === "1" && (
+                  <div className="w-full">
+                    <select
+                      className="w-full bg-transparent text-[16px] text-vysyamalaBlack font-normal py-[17px] px-[12px] border-[1px] border-[#282c3f80] rounded-[5px]"
+                      {...register("Profile_state")}
+                    >
+                      <option value="">Select State</option>
+                      {statesList.map((state) => (
+                        <option key={state.state_id} value={state.state_id}>
+                          {state.state_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
 
               <div className="max-lg:w-[30%] max-sm:w-full bg-gradient flex justify-center items-center py-[18px] px-[35px] shadow-redboxshadow rounded-[6px] space-x-2">

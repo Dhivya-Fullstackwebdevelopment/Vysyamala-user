@@ -35,7 +35,7 @@ const PlatinumModal: React.FC<PlatinumModalProps> = ({ isOpen, onClose }) => {
                     <p className="text-ashSecondary leading-relaxed mb-6">
                         {/* This profile is secured under <span className="font-semibold text-secondary">Platinum Private Membership</span>.
                         For access and assisted viewing, please contact our Customer Support. */}
-                        This is a <span className="font-semibold text-secondary">Platinum Private profile</span>. You are not permitted to view this profile. Contact customer support 9944851550
+                        This profile is secured under<span className="font-semibold text-secondary">Platinum Private Membership</span>. For access and assisted viewing, please contact our Customer Support 99448 51550
                     </p>
 
                     {/* <div
