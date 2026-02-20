@@ -126,6 +126,16 @@ export const Personal = () => {
         const data = response.data.data;
         setPersonalDetails(data);
 
+        if (data.personal_age) {
+          localStorage.setItem("personal_age", data.personal_age.toString());
+          sessionStorage.setItem("personal_age", data.personal_age.toString());
+        }
+        
+        if (data.personal_profile_height) {
+          localStorage.setItem("personal_height", data.personal_profile_height);
+          sessionStorage.setItem("personal_height", data.personal_profile_height);
+        }
+
         const matchedHeight = heights.find((height) =>
           height.height_description.includes(data.personal_profile_height)
         );
@@ -236,11 +246,14 @@ export const Personal = () => {
   };
 
   const handleHeightChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedHeight(e.target.value);
+    const newHeight = e.target.value;
+    setSelectedHeight(newHeight);
     setFormData((prevState) => ({
       ...prevState,
-      personal_profile_height: e.target.value,
+      personal_profile_height: newHeight,
     }));
+    localStorage.setItem("personal_height", newHeight);
+    sessionStorage.setItem("personal_height", newHeight);
   };
 
   const handleComplexionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -323,6 +336,8 @@ export const Personal = () => {
           ...prevState,
           personal_age: age,
         }));
+        localStorage.setItem("personal_age", age.toString());
+        sessionStorage.setItem("personal_age", age.toString());
       } else if (age < 18) {
         setError("Age must be 18 years or older.");
         setFormData((prevState) => ({
