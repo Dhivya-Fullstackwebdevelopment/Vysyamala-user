@@ -29,7 +29,9 @@ export interface Profile {
   wish_list?: number;
   user_profile_views?: string;
   star?: string
-  matching_score?: string
+  matching_score?: string;
+  visited_marriage_check: boolean;
+  visited_marriage_badge: string | null;
 }
 export interface DashboardDetails {
   matching_profile_count?: number;  // Optional field

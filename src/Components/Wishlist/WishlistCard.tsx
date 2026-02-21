@@ -159,7 +159,7 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
         {
           profile_id: loginuser_profileId,
           user_profile_id: profileId,
-        page_id: page_id,
+          page_id: page_id,
         }
       );
 
@@ -366,23 +366,24 @@ export const WishlistCard: React.FC<WishlistCardProps> = ({ page, sortBy }) => {
                           />
                         </div>
                       )}
-
-                      {bookmarkedProfiles.includes(profile.wishlist_profileid) ? (
-                        <MdBookmark
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleBookmarkToggle(profile.wishlist_profileid);
-                          }}
-                          className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
-                        />
-                      ) : (
-                        <MdBookmarkBorder
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleBookmarkToggle(profile.wishlist_profileid);
-                          }}
-                          className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
-                        />
+                      {!profile.wishlist_marriage_check && (
+                        bookmarkedProfiles.includes(profile.wishlist_profileid) ? (
+                          <MdBookmark
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleBookmarkToggle(profile.wishlist_profileid);
+                            }}
+                            className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
+                          />
+                        ) : (
+                          <MdBookmarkBorder
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleBookmarkToggle(profile.wishlist_profileid);
+                            }}
+                            className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
+                          />
+                        )
                       )}
                       {/* No Bookmark icon functionality here */}
                     </div>

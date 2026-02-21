@@ -338,22 +338,24 @@ export const ViewedProfilesCard: React.FC<ViewedProfilesCardProps> = ({ pageNumb
                   </div>
                 )}
 
-                {bookmarkedProfiles.includes(profile.visited_profileid) ? (
-                  <MdBookmark
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleBookmarkToggle(profile.visited_profileid);
-                    }}
-                    className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
-                  />
-                ) : (
-                  <MdBookmarkBorder
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleBookmarkToggle(profile.visited_profileid);
-                    }}
-                    className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
-                  />
+                {!profile.visited_marriage_check && (
+                  bookmarkedProfiles.includes(profile.visited_profileid) ? (
+                    <MdBookmark
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleBookmarkToggle(profile.visited_profileid);
+                      }}
+                      className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
+                    />
+                  ) : (
+                    <MdBookmarkBorder
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleBookmarkToggle(profile.visited_profileid);
+                      }}
+                      className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
+                    />
+                  )
                 )}
               </div>
 

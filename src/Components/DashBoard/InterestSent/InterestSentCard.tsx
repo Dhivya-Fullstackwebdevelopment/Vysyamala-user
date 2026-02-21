@@ -37,6 +37,8 @@ export interface Profile {
   myint_userstatus: string;
   myint_horoscope: string;
   myint_profile_wishlist: number;
+  visited_marriage_check: any;
+  visited_marriage_badge: string;
 }
 
 type InterestSentCardProps = {
@@ -275,7 +277,10 @@ export const InterestSentCard: React.FC<InterestSentCardProps> = ({ pageNumber, 
 
 
 
-  const handleProfileClick = async (profileId: string) => {
+  const handleProfileClick = async (profileId: string, visited_marriage_check: any) => {
+    if (visited_marriage_check) {
+      return;
+    }
     if (isPremiumLimitPopupOpen || isFreeLimitPopupOpen || isPlatinumModalOpen || activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
     const secureId = encryptId(profileId);
@@ -386,7 +391,7 @@ export const InterestSentCard: React.FC<InterestSentCardProps> = ({ pageNumber, 
       {profile.map((profile) => (
         <div
           key={profile.myint_profileid}
-          className="flex justify-start items-center space-x-5 relative rounded-xl py-5"
+          className={`flex justify-start items-center space-x-5 relative rounded-xl py-5 ${profile.visited_marriage_check ? "cursor-not-allowed" : ""}`}
         >
           {activeProfileId === profile.myint_profileid && (
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white bg-opacity-70 rounded-xl">
@@ -398,7 +403,7 @@ export const InterestSentCard: React.FC<InterestSentCardProps> = ({ pageNumber, 
           <div className="w-full flex justify-between items-center">
             <div className="flex justify-between items-center space-x-5  max-sm:flex-col max-sm:gap-5 max-sm:w-full max-sm:items-start">
               {/* Profile Image */}
-              <div className="relative  max-sm:w-full">
+              <div className={`relative  max-sm:w-full ${profile.visited_marriage_check ? "cursor-not-allowed" : ""}`}>
                 <img
                   src={profile.myint_Profile_img || defaultImgUrl}
                   alt="Profile-image"
@@ -427,22 +432,34 @@ export const InterestSentCard: React.FC<InterestSentCardProps> = ({ pageNumber, 
                     className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
                   />
                 )} */}
-                {bookmarkedProfiles.includes(profile.myint_profileid) ? (
-                  <MdBookmark
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleBookmarkToggle(profile.myint_profileid);
-                    }}
-                    className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
-                  />
-                ) : (
-                  <MdBookmarkBorder
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleBookmarkToggle(profile.myint_profileid);
-                    }}
-                    className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
-                  />
+                {profile.visited_marriage_check && (
+                  <div className="absolute inset-0 rounded-[6px] backdrop-blur-sm bg-black/30 flex items-center justify-center">
+                    <img
+                      src={profile.visited_marriage_badge || ""}
+                      alt="Marriage Badge"
+                      className="w-[90px] h-[90px] object-contain rounded-full bg-[#F8EFE0] p-2 shadow-xl"
+                    />
+                  </div>
+                )}
+
+                {!profile.visited_marriage_check && (
+                  bookmarkedProfiles.includes(profile.myint_profileid) ? (
+                    <MdBookmark
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleBookmarkToggle(profile.myint_profileid);
+                      }}
+                      className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
+                    />
+                  ) : (
+                    <MdBookmarkBorder
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleBookmarkToggle(profile.myint_profileid);
+                      }}
+                      className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
+                    />
+                  )
                 )}
               </div>
 
@@ -453,9 +470,10 @@ export const InterestSentCard: React.FC<InterestSentCardProps> = ({ pageNumber, 
                   <div className="flex items-center">
                     <h5
                       onClick={() =>
-                        handleProfileClick(profile.myint_profileid)
+                        !profile.visited_marriage_check &&
+                        handleProfileClick(profile.myint_profileid, profile.visited_marriage_check)
                       }
-                      className="text-[20px] text-secondary font-semibold cursor-pointer">
+                      className={`text-[20px] text-secondary font-semibold ${profile.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}>
                       {profile.myint_profile_name}{" "}
                       <span className="text-sm text-ashSecondary">
                         ({profile.myint_profileid})

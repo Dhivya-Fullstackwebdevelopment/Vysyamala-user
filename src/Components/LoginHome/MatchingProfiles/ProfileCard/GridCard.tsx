@@ -94,6 +94,7 @@ export const GridCard: React.FC<GridCardProps> = ({ profile }) => {
   // Updated handleCardClick in GridCard component
   const handleCardClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation();
+    if (profile.visited_marriage_check) return;
     if (isPremiumLimitPopupOpen || isPlatinumModalOpen || isFreeLimitPopupOpen || isLoading) return;
     setIsLoading(true);
 
@@ -188,7 +189,7 @@ export const GridCard: React.FC<GridCardProps> = ({ profile }) => {
         setIsFreeLimitPopupOpen(true);
       } else if (serverMessage?.includes("Today’s view limit has been reached")) {
         setIsPremiumLimitPopupOpen(true);
-      }else {
+      } else {
         toast.error(serverMessage || "Error accessing profile.");
         console.error("API Error:", error);
       }
@@ -222,7 +223,7 @@ export const GridCard: React.FC<GridCardProps> = ({ profile }) => {
   return (
     <div
       onClick={handleCardClick}
-      className="relative sm:w-fit md:w-11/12 rounded-xl shadow-profileCardShadow px-3 py-3 mx-auto"
+      className={`relative sm:w-fit md:w-11/12 rounded-xl shadow-profileCardShadow px-3 py-3 mx-auto ${profile.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}
     >
       {/* <div className="mb-3">
         <img
@@ -251,6 +252,16 @@ export const GridCard: React.FC<GridCardProps> = ({ profile }) => {
               }}
               className="w-[321px] h-[321px] rounded-[6px] mx-auto opacity-50" // Reduced opacity to indicate locked state
             />
+            {profile.visited_marriage_check && (
+              <div className="absolute inset-0 z-20 rounded-[6px] backdrop-blur-sm bg-black/30 flex items-center justify-center">
+                <img
+                  src={profile.visited_marriage_badge || ""}
+                  alt="Marriage Badge"
+                  className="w-[90px] h-[90px] object-contain rounded-full bg-[#F8EFE0] p-2 shadow-2xl animate-in zoom-in duration-300"
+                />
+              </div>
+            )}
+
             <div className="absolute top-0 left-0 w-full h-full rounded-[6px] flex items-center justify-center bg-black bg-opacity-40">
               <div className="text-center lock-style text-white">
                 <IoMdLock className="w-fit mx-auto text-secondary text-[50px]" />
@@ -261,15 +272,28 @@ export const GridCard: React.FC<GridCardProps> = ({ profile }) => {
             </div>
           </div>
         ) : (
-          <img
-            src={profile.profile_img || defaultImgUrl}
-            alt={profile.profile_name}
-            onError={(e) => {
-              e.currentTarget.onerror = null; // Prevent infinite loop
-              e.currentTarget.src = defaultImgUrl; // Set default image
-            }}
-            className="w-[320px] h-[280px] rounded-[6px] mx-auto object-cover object-top"
-          />
+          <div className="relative"> {/* Added relative wrapper here */}
+            <img
+              src={profile.profile_img || defaultImgUrl}
+              alt={profile.profile_name}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = defaultImgUrl;
+              }}
+              className="w-[320px] h-[280px] rounded-[6px] mx-auto object-cover object-top"
+            />
+
+            {/* --- ADDED BADGE HERE (For Normal State) --- */}
+            {profile.visited_marriage_check && (
+              <div className="absolute inset-0 z-20 rounded-[6px] backdrop-blur-sm bg-black/30 flex items-center justify-center">
+                <img
+                  src={profile.visited_marriage_badge || ""}
+                  alt="Marriage Badge"
+                  className="w-[90px] h-[90px] object-contain rounded-full bg-[#F8EFE0] p-2 shadow-2xl animate-in zoom-in duration-300"
+                />
+              </div>
+            )}
+          </div>
         )}
       </div>
 
@@ -278,11 +302,11 @@ export const GridCard: React.FC<GridCardProps> = ({ profile }) => {
         <div className="flex">
           <h4
             onClick={handleCardClick}
-            className="text-secondary text-[20px] font-semibold cursor-pointer mb-1">
+            className={`text-secondary text-[20px] font-semibold cursor-pointer mb-1 ${profile.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}>
             {profile.profile_name}{" "}
             <span
               onClick={handleCardClick}
-              className="text-sm text-ashSecondary font-semibold">
+              className={`text-sm text-ashSecondary font-semibold ${profile.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}>
               ({profile.profile_id})
             </span>
           </h4>
@@ -305,14 +329,15 @@ export const GridCard: React.FC<GridCardProps> = ({ profile }) => {
       {isBookmarked ? (
         <MdBookmark
           onClick={handleBookmark}
-          className="absolute top-4 right-4 text-secondary text-[22px] cursor-pointer"
+          className={`absolute top-4 right-4 text-secondary text-[22px] ${profile.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}
         />
       ) : (
         <MdBookmarkBorder
           onClick={handleBookmark}
-          className="absolute top-4 right-4 text-secondary text-[22px] cursor-pointer"
+          className={`absolute top-4 right-4 text-secondary text-[22px] ${profile.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}
         />
       )}
+
       <PlatinumModal
         isOpen={isPlatinumModalOpen}
         onClose={() => setIsPlatinumModalOpen(false)}

@@ -104,6 +104,7 @@ export const ListCard: React.FC<ListCardProps> = ({ profile }) => {
 
   const handleCardClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation();
+    if (profile.visited_marriage_check) return;
     if (isPremiumLimitPopupOpen || isPlatinumModalOpen || isFreeLimitPopupOpen || isLoading) return;
     setIsLoading(true);
 
@@ -243,7 +244,7 @@ export const ListCard: React.FC<ListCardProps> = ({ profile }) => {
   return (
     // <Link to="/ProfileDetails" target="_blank">
     <div
-      className="flex justify-between items-start space-x-5 relative rounded-xl shadow-profileCardShadow p-6 mb-5 max-md:w-[400px] max-sm:w-[300px]"
+      className={`flex justify-between items-start space-x-5 relative rounded-xl shadow-profileCardShadow p-6 mb-5 max-md:w-[400px] max-sm:w-[300px] ${profile.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}
       onClick={handleCardClick}
     >
       {isLoading && (
@@ -277,13 +278,15 @@ export const ListCard: React.FC<ListCardProps> = ({ profile }) => {
                   }}
                   className="w-[218px] h-[218px] rounded-[6px] max-md:w-full max-md:h-[280px] opacity-50" // Reduced opacity when locked
                 />
-                {/* Lock overlay */}
-                <div className="absolute inset-0 flex flex-col justify-center items-center text-center bg-black bg-opacity-50 rounded-[6px]">
-                  <IoMdLock className="w-fit mx-auto text-secondary text-[50px]" />
-                  <p className="text-sm text-white font-semibold">
-                    Click and Enter password to view profile photo
-                  </p>
-                </div>
+                {profile.visited_marriage_check && (
+                  <div className="absolute inset-0 z-20 rounded-[6px] backdrop-blur-sm bg-black/30 flex items-center justify-center">
+                    <img
+                      src={profile.visited_marriage_badge || ""}
+                      alt="Marriage Badge"
+                      className="w-[90px] h-[90px] object-contain rounded-full bg-[#F8EFE0] p-2 shadow-2xl animate-in zoom-in duration-300"
+                    />
+                  </div>
+                )}
               </>
             ) : (
               <img
@@ -297,16 +300,35 @@ export const ListCard: React.FC<ListCardProps> = ({ profile }) => {
               />
             )}
 
+            {profile.visited_marriage_check && (
+              <div className="absolute inset-0 z-20 rounded-[6px] backdrop-blur-sm bg-black/30 flex items-center justify-center">
+                <img
+                  src={profile.visited_marriage_badge || ""}
+                  alt="Marriage Badge"
+                  className="w-[90px] h-[90px] object-contain rounded-full bg-[#F8EFE0] p-2 shadow-2xl animate-in zoom-in duration-300"
+                />
+              </div>
+            )}
+            {/* Lock overlay */}
+            {!profile.visited_marriage_check && profile.photo_protection === 1 && (
+              <div className="absolute inset-0 flex flex-col justify-center items-center text-center bg-black bg-opacity-50 rounded-[6px]">
+                <IoMdLock className="w-fit mx-auto text-secondary text-[50px]" />
+                <p className="text-sm text-white font-semibold">
+                  Click and Enter password to view profile photo
+                </p>
+              </div>
+            )}
+
             {/* Bookmark Icon */}
             {isBookmarked ? (
               <MdBookmark
                 onClick={handleBookmark}
-                className="absolute top-2 right-2 text-secondary text-[22px] cursor-pointer"
+                className={`absolute top-2 right-2 text-secondary text-[22px] ${profile.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}
               />
             ) : (
               <MdBookmarkBorder
                 onClick={handleBookmark}
-                className="absolute top-2 right-2 text-secondary text-[22px] cursor-pointer"
+                className={`absolute top-2 right-2 text-secondary text-[22px] ${profile.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}
               />
             )}
           </div>
@@ -320,11 +342,11 @@ export const ListCard: React.FC<ListCardProps> = ({ profile }) => {
               <div className="flex items-center">
                 <h5
                   onClick={handleCardClick}
-                  className="text-[20px] text-secondary font-semibold cursor-pointer">
+                  className={`text-[20px] text-secondary font-semibold ${profile.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}>
                   {profile_name || "Unknown"}{" "}
                   <span
                     onClick={handleCardClick}
-                    className="text-sm text-ashSecondary">
+                    className={`text-sm text-ashSecondary ${profile.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}>
                     ({profile_id || "N/A"})
                   </span>
                 </h5>

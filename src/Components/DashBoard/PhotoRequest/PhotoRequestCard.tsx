@@ -58,6 +58,8 @@ interface PhotoRequestData {
   req_userstatus: string;
   req_horoscope: string;
   req_profile_wishlist: string | number;
+  visited_marriage_check: any;
+  visited_marriage_badge: string;
 }
 
 interface proptype {
@@ -351,6 +353,9 @@ const PhotoRequestCard = ({
   // };
 
   const handleProfileClick = async (profileId: string, sortBy: string) => {
+    if (data.visited_marriage_check) {
+      return;
+    }
     if (isPremiumLimitPopupOpen || isFreeLimitPopupOpen || isPlatinumModalOpen || activeProfileId) return;
     setActiveProfileId(profileId); // set the card that's loading
     const secureId = encryptId(profileId);
@@ -448,7 +453,7 @@ const PhotoRequestCard = ({
 
       <div
         key={data.req_profileid}
-        className="relative border-b-[1px] border-footer-text-gray mb-4"
+        className={`relative border-b-[1px] border-footer-text-gray mb-4 ${data.visited_marriage_check ? "cursor-not-allowed" : ""}`}
       >
         {activeProfileId === data.req_profileid && (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white bg-opacity-70 rounded-xl">
@@ -467,19 +472,31 @@ const PhotoRequestCard = ({
                     e.currentTarget.onerror = null; // Prevent infinite loop
                     e.currentTarget.src = defaultImgUrl; // Set default image
                   }}
-                  className="rounded-[6px] w-[218px] h-[218px]  max-md:w-full"
+                  className={`rounded-[6px] w-[218px] h-[218px]  max-md:w-full ${data.visited_marriage_check ? "cursor-not-allowed" : ""}`}
                   onClick={() => handleProfileClick(data.req_profileid, sortBy)} // ✅ Add this line
                 />
-                {isBookmarked ? (
-                  <MdBookmark
-                    onClick={handleBookmarkToggle}
-                    className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
-                  />
-                ) : (
-                  <MdBookmarkBorder
-                    onClick={handleBookmarkToggle}
-                    className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
-                  />
+                {data.visited_marriage_check && (
+                  <div className="absolute inset-0 rounded-[6px] backdrop-blur-sm bg-black/30 flex items-center justify-center">
+                    <img
+                      src={data.visited_marriage_badge || ""}
+                      alt="Marriage Badge"
+                      className="w-[90px] h-[90px] object-contain rounded-full bg-[#F8EFE0] p-2 shadow-xl"
+                    />
+                  </div>
+                )}
+
+                {!data.visited_marriage_check && (
+                  isBookmarked ? (
+                    <MdBookmark
+                      onClick={handleBookmarkToggle}
+                      className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
+                    />
+                  ) : (
+                    <MdBookmarkBorder
+                      onClick={handleBookmarkToggle}
+                      className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
+                    />
+                  )
                 )}
               </div>
 
@@ -495,7 +512,7 @@ const PhotoRequestCard = ({
                 <div className="relative mb-2">
                   <div className="flex items-center">
                     <h5
-                      className="text-[20px] text-secondary font-semibold cursor-pointer flex gap-2 items-center"
+                      className={`text-[20px] text-secondary font-semibold ${data.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"} flex gap-2 items-center`}
                       onClick={() => handleProfileClick(data.req_profileid, sortBy)}
                     >
                       {data.req_profile_name}

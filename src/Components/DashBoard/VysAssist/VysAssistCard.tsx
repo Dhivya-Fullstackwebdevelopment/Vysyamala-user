@@ -40,7 +40,9 @@ interface ProfileData {
     vys_lastvisit: string;
     vys_userstatus: string;
     vys_horoscope: string;
-    vys_profile_wishlist: number
+    vys_profile_wishlist: number;
+    visited_marriage_check: any;
+    visited_marriage_badge: string;
     // score: number; // Define the score prop
 }
 
@@ -175,7 +177,8 @@ export const VysAssistCard: React.FC<VysassistCardProps> = ({ pageNumber, sortBy
         fetchProfileData();
     }, [pageNumber, sortBy, loginuser_profileId]);
 
-    const handleProfileClick = async (profileId: string) => {
+    const handleProfileClick = async (profileId: string, visited_marriage_check?: any) => {
+        if (visited_marriage_check) return;
         if (isPremiumLimitPopupOpen || isFreeLimitPopupOpen || isPlatinumModalOpen || activeProfileId) return;
         setActiveProfileId(profileId); // set the card that's loading
         const secureId = encryptId(profileId);
@@ -195,21 +198,6 @@ export const VysAssistCard: React.FC<VysassistCardProps> = ({ pageNumber, sortBy
                     page_id: page_id,
                 }
             );
-
-            // if (checkResponse.data.status === "failure") {
-            //     toast.error(checkResponse.data.message || "Limit reached to view profile");
-            //     setActiveProfileId(null);
-            //     return;
-            // }
-
-            // if (checkResponse.data.status === "failure") {
-            //     if (checkResponse.data.message === "Profile visibility restricted") {
-            //         setIsPlatinumModalOpen(true);
-            //     } else {
-            //         toast.error(checkResponse.data.message || "Limit reached to view profile");
-            //     }
-            //     return;
-            // }
 
             if (checkResponse.data.status === "failure") {
                 const message: string = checkResponse.data.message || "";
@@ -281,7 +269,7 @@ export const VysAssistCard: React.FC<VysassistCardProps> = ({ pageNumber, sortBy
                 <div>No Vysassist found for the given profile ID</div>
             ) : (
                 profiles.map(profile => (
-                    <div key={profile.vys_profileid} className="flex justify-start items-center space-x-5 relative rounded-xl py-5">
+                    <div key={profile.vys_profileid} className={`flex justify-start items-center space-x-5 relative rounded-xl py-5 ${profile.visited_marriage_check ? "cursor-not-allowed" : ""}`}>
                         {activeProfileId === profile.vys_profileid && (
                             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white bg-opacity-70 rounded-xl">
                                 <Hearts height="80" width="80" color="#FF6666" visible={true} />
@@ -291,7 +279,7 @@ export const VysAssistCard: React.FC<VysassistCardProps> = ({ pageNumber, sortBy
                         <div className="w-full flex justify-between items-center">
                             <div className="flex justify-between items-center space-x-5  max-sm:flex-col max-sm:gap-5 max-sm:w-full max-sm:items-start">
                                 {/* Profile Image */}
-                                <div className="relative max-sm:w-full">
+                                <div className={`relative max-sm:w-full ${profile.visited_marriage_check ? "cursor-not-allowed" : ""}`}>
                                     <img
                                         src={profile.vys_Profile_img || defaultImgUrl}
                                         alt="Profile-image"
@@ -299,29 +287,39 @@ export const VysAssistCard: React.FC<VysassistCardProps> = ({ pageNumber, sortBy
                                             e.currentTarget.onerror = null; // Prevent infinite loop
                                             e.currentTarget.src = defaultImgUrl; // Set default image
                                         }}
-                                        onClick={() => handleProfileClick(profile.vys_profileid)}
+                                        onClick={() => handleProfileClick(profile.vys_profileid, profile.visited_marriage_check)}
                                         className="rounded-[6px] w-[218px] h-[218px]  max-md:w-full"
                                     />
-                                    {/* {isBookmarked[profile.vys_profileid] ? ( */}
+                                    {profile.visited_marriage_check && (
+                                        <div className="absolute inset-0 rounded-[6px] backdrop-blur-sm bg-black/30 flex items-center justify-center">
+                                            <img
+                                                src={profile.visited_marriage_badge || ""}
+                                                alt="Marriage Badge"
+                                                className="w-[90px] h-[90px] object-contain rounded-full bg-[#F8EFE0] p-2 shadow-xl"
+                                            />
+                                        </div>
+                                    )}
 
-                                    {isBookmarked(profile.vys_profile_wishlist) ? (
-                                        <MdBookmark
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleBookmarkToggle(profile.vys_profileid, profile.vys_profile_wishlist);
-                                            }}
-                                            className={`absolute top-2 right-2 text-white text-[22px] cursor-pointer ${updatingBookmarks.has(profile.vys_profileid) ? 'opacity-50' : ''
-                                                }`}
-                                        />
-                                    ) : (
-                                        <MdBookmarkBorder
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleBookmarkToggle(profile.vys_profileid, profile.vys_profile_wishlist);
-                                            }}
-                                            className={`absolute top-2 right-2 text-white text-[22px] cursor-pointer ${updatingBookmarks.has(profile.vys_profileid) ? 'opacity-50' : ''
-                                                }`}
-                                        />
+                                    {!profile.visited_marriage_check && (
+                                        isBookmarked(profile.vys_profile_wishlist) ? (
+                                            <MdBookmark
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleBookmarkToggle(profile.vys_profileid, profile.vys_profile_wishlist);
+                                                }}
+                                                className={`absolute top-2 right-2 text-white text-[22px] cursor-pointer ${updatingBookmarks.has(profile.vys_profileid) ? 'opacity-50' : ''
+                                                    }`}
+                                            />
+                                        ) : (
+                                            <MdBookmarkBorder
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleBookmarkToggle(profile.vys_profileid, profile.vys_profile_wishlist);
+                                                }}
+                                                className={`absolute top-2 right-2 text-white text-[22px] cursor-pointer ${updatingBookmarks.has(profile.vys_profileid) ? 'opacity-50' : ''
+                                                    }`}
+                                            />
+                                        )
                                     )}
                                 </div>
 
@@ -330,8 +328,8 @@ export const VysAssistCard: React.FC<VysassistCardProps> = ({ pageNumber, sortBy
                                     {/* Name & Profile ID */}
                                     <div className="relative mb-2">
                                         <h5
-                                            onClick={() => handleProfileClick(profile.vys_profileid)}
-                                            className="flex gap-1    text-[20px] text-secondary font-semibold cursor-pointer">
+                                            onClick={() => handleProfileClick(profile.vys_profileid, profile.visited_marriage_check)}
+                                            className={`flex gap-1    text-[20px] text-secondary font-semibold ${profile.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}>
                                             {profile.vys_profile_name}{" "}
                                             <span className="text-sm text-ashSecondary">
                                                 ({profile.vys_profileid})

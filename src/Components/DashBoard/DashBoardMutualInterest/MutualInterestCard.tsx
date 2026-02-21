@@ -18,6 +18,8 @@ import FreeProfileRestrictionPopup from "../ReUsePopup/FreeProfileRestrictionPop
 
 // Define the Profile interface
 export interface Profile {
+  visited_marriage_check: any;
+  visited_marriage_badge: string;
   mutint_Profile_img: string;
   mutint_profile_name: string;
   mutint_profileid: string;
@@ -215,6 +217,9 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   const [isPremiumLimitPopupOpen, setIsPremiumLimitPopupOpen] = useState(false);
 
   const handleProfileClick = async (profileId: string, sortBy: string) => {
+    if (profile.visited_marriage_check) {
+      return;
+    }
     if (isPremiumLimitPopupOpen || isFreeLimitPopupOpen || isPlatinumModalOpen || activeProfileId) return;
     setActiveProfileId(profileId);
     const secureId = encryptId(profileId);
@@ -330,7 +335,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         onClose={() => setIsPremiumLimitPopupOpen(false)}
       />
       <div
-        className="flex justify-start items-center space-x-5 relative rounded-xl shadow-profileCardShadow p-5 mb-5"
+        className={`flex justify-start items-center space-x-5 relative rounded-xl shadow-profileCardShadow p-5 mb-5 ${profile.visited_marriage_check ? "cursor-not-allowed" : ""}`}
         onClick={() => handleProfileClick(profile.mutint_profileid, sortBy)}
       >
         {activeProfileId === profile.mutint_profileid && (
@@ -341,7 +346,12 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         )}
         <div className="w-full flex justify-between items-center">
           <div className="flex justify-between items-center space-x-5 max-sm:flex-col max-sm:gap-5 max-sm:w-full max-sm:items-start">
-            <div className="relative max-sm:w-full">
+            <div
+              onClick={() =>
+                !profile.visited_marriage_check &&
+                handleProfileClick(profile.mutint_profileid, profile.visited_marriage_check)
+              }
+              className="relative max-sm:w-full">
               <img
                 src={profile.mutint_Profile_img || defaultImgUrl}
                 alt="Profile image"
@@ -351,7 +361,18 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                 }}
                 className="rounded-[6px] w-[218px] h-[218px] max-md:w-full"
               />
-              {isBookmarked ? (
+              {profile.visited_marriage_check && (
+                <div className="absolute inset-0 rounded-[6px] backdrop-blur-sm bg-black/30 flex items-center justify-center">
+                  <img
+                    src={profile.visited_marriage_badge || ""}
+                    alt="Marriage Badge"
+                    className="w-[90px] h-[90px] object-contain rounded-full bg-[#F8EFE0] p-2 shadow-xl"
+                  />
+                </div>
+              )}
+              
+              {!profile.visited_marriage_check && (
+                isBookmarked ? (
                 <MdBookmark
                   onClick={onBookmarkToggle}
                   className={`absolute top-2 right-2 text-white text-[22px] cursor-pointer ${isUpdating ? 'opacity-50' : ''
@@ -363,15 +384,16 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                   className={`absolute top-2 right-2 text-white text-[22px] cursor-pointer ${isUpdating ? 'opacity-50' : ''
                     }`}
                 />
+                  )
               )}
             </div>
 
             <div>
               <div className="relative mb-2">
                 <div className="flex items-center">
-                  <h5 className="text-[20px] text-secondary font-semibold cursor-pointer">
+                  <h5 className={`text-[20px] text-secondary font-semibold ${profile.visited_marriage_check ? "cursor-not-allowed" : ""}`}>
                     {profile.mutint_profile_name || "Unknown"}{" "}
-                    <span className="text-sm text-ashSecondary">
+                    <span className={`text-sm text-ashSecondary ${profile.visited_marriage_check ? "cursor-not-allowed" : ""}`}>
                       ({profile.mutint_profileid || "N/A"})
                     </span>
                   </h5>

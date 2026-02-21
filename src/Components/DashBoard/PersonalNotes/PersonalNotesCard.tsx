@@ -35,6 +35,8 @@ interface GetProfListMatch {
   notes_userstatus: string;
   notes_lastvisit: string,
   notes_views?: number,
+  visited_marriage_check: any;
+  visited_marriage_badge: string;
 }
 
 interface PersonalNotesCardProps {
@@ -92,6 +94,8 @@ export const PersonalNotesCard: React.FC<PersonalNotesCardProps> = ({ pageNumber
           notes_userstatus: profile.notes_userstatus,
           notes_lastvisit: profile.notes_lastvisit,
           notes_views: profile.notes_views,
+          visited_marriage_check: profile.visited_marriage_check,
+          visited_marriage_badge: profile.visited_marriage_badge,
         }));
 
         setProfilesData(transformedProfiles);
@@ -156,16 +160,19 @@ export const PersonalNotesCard: React.FC<PersonalNotesCardProps> = ({ pageNumber
   //   navigate(`/ProfileDetails?id=${profileId}`);
   // };
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<string | null>(null);
   const location = useLocation();
   const [isPlatinumModalOpen, setIsPlatinumModalOpen] = useState(false);
   const [isFreeLimitPopupOpen, setIsFreeLimitPopupOpen] = useState(false);
   const [isPremiumLimitPopupOpen, setIsPremiumLimitPopupOpen] = useState(false);
 
-  const handleProfileClick = async (profileId: string) => {
+  const handleProfileClick = async (profileId: string, visited_marriage_check?: any) => {
+    if (visited_marriage_check) {
+      return;
+    }
     if (isLoading) return;
     if (isPremiumLimitPopupOpen || isFreeLimitPopupOpen || isPlatinumModalOpen) return;
-    setIsLoading(true);
+    setIsLoading(profileId);
     const secureId = encryptId(profileId);
     const loginuser_profileId = localStorage.getItem("loginuser_profile_id");
 
@@ -183,22 +190,6 @@ export const PersonalNotesCard: React.FC<PersonalNotesCardProps> = ({ pageNumber
           page_id: page_id,
         }
       );
-
-      // Check for failure response
-      // if (checkResponse.data.status === "failure") {
-      //   toast.error(checkResponse.data.message || "Limit reached to view profile");
-      //   return;
-      // }
-
-
-      // if (checkResponse.data.status === "failure") {
-      //   if (checkResponse.data.message === "Profile visibility restricted") {
-      //     setIsPlatinumModalOpen(true);
-      //   } else {
-      //     toast.error(checkResponse.data.message || "Limit reached to view profile");
-      //   }
-      //   return;
-      // }
 
       if (checkResponse.data.status === "failure") {
         const message: string = checkResponse.data.message || "";
@@ -283,7 +274,7 @@ export const PersonalNotesCard: React.FC<PersonalNotesCardProps> = ({ pageNumber
       }
       console.error("API Error:", error);
     } finally {
-      setIsLoading(false);
+      setIsLoading(null);
     }
   };
 
@@ -296,13 +287,23 @@ export const PersonalNotesCard: React.FC<PersonalNotesCardProps> = ({ pageNumber
     );
   }
 
+
   return (
     <div>
       <ToastContainer />
       {profilesData.length > 0 ? (
         profilesData.map((profileData) => (
-          <div key={profileData.profile_id} className="space-y-5 rounded-xl shadow-profileCardShadow p-5 mb-5">
+          <div key={profileData.profile_id} className={`space-y-5 rounded-xl shadow-profileCardShadow p-5 mb-5 ${profileData.visited_marriage_check ? "cursor-not-allowed" : ""}`}>
+
             <div className="flex justify-start items-start space-x-5 relative">
+              {isLoading === profileData.profile_id && (
+                <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/70 rounded-xl backdrop-blur-[1px]">
+                  <Hearts height="60" width="60" color="#FF6666" visible={true} />
+                  <p className="mt-2 text-[12px] text-primary font-semibold animate-pulse">
+                    Opening Profile...
+                  </p>
+                </div>
+              )}
               <div className="w-full flex justify-between items-center">
                 <div className="flex justify-between items-center space-x-5  max-sm:flex-col max-sm:gap-5 max-sm:w-full max-sm:items-start">
                   {/* Profile Image */}
@@ -313,16 +314,28 @@ export const PersonalNotesCard: React.FC<PersonalNotesCardProps> = ({ pageNumber
                         e.currentTarget.src = defaultImgUrl; // Set default image
                       }}
                       className="rounded-[6px] w-[218px] h-[218px]  max-md:w-full" />
-                    {profileData.wish_list === 1 || profileData.wish_list === "1" ? (
-                      <MdBookmark
-                        onClick={() => handleBookmarkToggle(profileData.profile_id, profileData.wish_list)}
-                        className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
-                      />
-                    ) : (
-                      <MdBookmarkBorder
-                        onClick={() => handleBookmarkToggle(profileData.profile_id, profileData.wish_list)}
-                        className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
-                      />
+                    {profileData.visited_marriage_check && (
+                      <div className="absolute inset-0 rounded-[6px] backdrop-blur-sm bg-black/30 flex items-center justify-center">
+                        <img
+                          src={profileData.visited_marriage_badge || ""}
+                          alt="Marriage Badge"
+                          className="w-[90px] h-[90px] object-contain rounded-full bg-[#F8EFE0] p-2 shadow-xl"
+                        />
+                      </div>
+                    )}
+
+                    {!profileData.visited_marriage_check && (
+                      profileData.wish_list === 1 || profileData.wish_list === "1" ? (
+                        <MdBookmark
+                          onClick={() => handleBookmarkToggle(profileData.profile_id, profileData.wish_list)}
+                          className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
+                        />
+                      ) : (
+                        <MdBookmarkBorder
+                          onClick={() => handleBookmarkToggle(profileData.profile_id, profileData.wish_list)}
+                          className="absolute top-2 right-2 text-white text-[22px] cursor-pointer"
+                        />
+                      )
                     )}
                   </div>
 
@@ -330,8 +343,8 @@ export const PersonalNotesCard: React.FC<PersonalNotesCardProps> = ({ pageNumber
                   <div className="">
                     {/* Name & Profile ID */}
                     <div className="relative mb-2">
-                      <h5 className="text-[20px] text-secondary font-semibold cursor-pointer"
-                        onClick={() => handleProfileClick(profileData.profile_id)}
+                      <h5 className={`text-[20px] text-secondary font-semibold ${profileData.visited_marriage_check ? "cursor-not-allowed" : "cursor-pointer"}`}
+                        onClick={() => handleProfileClick(profileData.profile_id, profileData.visited_marriage_check)}
                       >
                         {profileData.profile_name}
                         <span className="text-sm text-ashSecondary ml-2">
